@@ -24,6 +24,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 
 #include "TTree.h"
 
@@ -64,8 +65,10 @@ private:
   bool doMC_;
   bool useHepMC_;
   bool doVertex_;
+  bool doPixel_;
 
   int evtPlaneLevel_;
+  edm::EDGetTokenT<edmNew::DetSetVector<SiPixelCluster> > PixelClusSrc_;
 
   edm::Service<TFileService> fs_;
 
@@ -91,6 +94,7 @@ private:
   float fEtMR;
   int fNchargedPtCut;
   int fNchargedPtCutMR;
+  int NPixClus;
 
   int proc_id;
   float pthat;
@@ -140,7 +144,9 @@ HiEvtAnalyzer::HiEvtAnalyzer(const edm::ParameterSet& iConfig) :
   doMC_(iConfig.getParameter<bool> ("doMC")),
   useHepMC_(iConfig.getParameter<bool> ("useHepMC")),
   doVertex_(iConfig.getParameter<bool>("doVertex")),
-  evtPlaneLevel_(iConfig.getParameter<int>("evtPlaneLevel"))
+  doPixel_(iConfig.getParameter<bool>("doPixel")),
+  evtPlaneLevel_(iConfig.getParameter<int>("evtPlaneLevel")),  
+ 	PixelClusSrc_(consumes<edmNew::DetSetVector<SiPixelCluster> >(iConfig.getParameter<edm::InputTag> ("PixelClusSrc")))
 {
 
 }
@@ -289,7 +295,10 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     vy=vertex->begin()->y();
     vz=vertex->begin()->z();
   }
-
+  
+  edm::Handle< edmNew::DetSetVector<SiPixelCluster> > input;
+  iEvent.getByToken(PixelClusSrc_, input);
+  NPixClus = input->size();
   // Done w/ all vars
   thi_->Fill();
 }
@@ -401,6 +410,7 @@ HiEvtAnalyzer::beginJob()
   thi_->Branch("hiNtracksPtCut",&hiNtracksPtCut,"hiNtracksPtCut/I");
   thi_->Branch("hiNtracksEtaCut",&hiNtracksEtaCut,"hiNtracksEtaCut/I");
   thi_->Branch("hiNtracksEtaPtCut",&hiNtracksEtaPtCut,"hiNtracksEtaPtCut/I");
+  thi_->Branch("NPixClus",&NPixClus,"NPixClus/I");
 
   // Event plane
   if (doEvtPlane_) {

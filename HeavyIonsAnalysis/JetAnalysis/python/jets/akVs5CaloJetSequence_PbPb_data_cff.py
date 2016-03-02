@@ -9,7 +9,7 @@ from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
 
 akVs5Calomatch = patJetGenJetMatch.clone(
     src = cms.InputTag("akVs5CaloJets"),
-    matched = cms.InputTag("ak5HiGenJets"),
+    matched = cms.InputTag("ak5HiSignalGenJets"),
     maxDeltaR = 0.5
     )
 
@@ -27,13 +27,13 @@ akVs5Calocorr = patJetCorrFactors.clone(
 
 akVs5CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akVs5CaloJets'))
 
-#akVs5Caloclean   = heavyIonCleanedGenJets.clone(src = cms.InputTag('ak5HiGenJets'))
+#akVs5Caloclean   = heavyIonCleanedGenJets.clone(src = cms.InputTag('ak5HiSignalGenJets'))
 
 akVs5CalobTagger = bTaggers("akVs5Calo",0.5)
 
 #create objects locally since they dont load properly otherwise
 #akVs5Calomatch = akVs5CalobTagger.match
-akVs5Caloparton = patJetPartonMatch.clone(src = cms.InputTag("akVs5CaloJets"), matched = cms.InputTag("genParticles"))
+akVs5Caloparton = patJetPartonMatch.clone(src = cms.InputTag("akVs5CaloJets"), matched = cms.InputTag("hiSignalGenParticles"))
 akVs5CaloPatJetFlavourAssociationLegacy = akVs5CalobTagger.PatJetFlavourAssociationLegacy
 akVs5CaloPatJetPartons = akVs5CalobTagger.PatJetPartons
 akVs5CaloJetTracksAssociatorAtVertex = akVs5CalobTagger.JetTracksAssociatorAtVertex
@@ -183,7 +183,7 @@ akVs5CaloNjettiness = Njettiness.clone(
 akVs5CalopatJetsWithBtagging.userData.userFloats.src += ['akVs5CaloNjettiness:tau1','akVs5CaloNjettiness:tau2','akVs5CaloNjettiness:tau3']
 
 akVs5CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs5CalopatJetsWithBtagging"),
-                                                             genjetTag = 'ak5HiGenJets',
+                                                             genjetTag = 'ak5HiSignalGenJets',
                                                              rParam = 0.5,
                                                              matchJets = cms.untracked.bool(False),
                                                              matchTag = 'patJetsWithBtagging',
@@ -193,7 +193,7 @@ akVs5CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs5Ca
                                                              isMC = False,
 							     doSubEvent = False,
                                                              useHepMC = cms.untracked.bool(False),
-							     genParticles = cms.untracked.InputTag("genParticles"),
+							     genParticles = cms.untracked.InputTag("hiSignalGenParticles"),
 							     eventInfoTag = cms.InputTag("generator"),
                                                              doLifeTimeTagging = cms.untracked.bool(True),
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),

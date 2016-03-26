@@ -82,6 +82,7 @@ private:
   int TaggedJet(reco::Jet calojet, edm::Handle<reco::JetTagCollection > jetTags );
   float getTau(unsigned num, const reco::GenJet object) const;
   void analyzeSubjets(const reco::Jet jet);
+  void analyzeGenSubjets(const reco::GenJet jet);
   
   
   std::auto_ptr<fastjet::contrib::Njettiness>   routine_;
@@ -93,6 +94,7 @@ private:
   edm::EDGetTokenT<pat::JetCollection>         jetTagPat_;
   edm::EDGetTokenT<reco::JetView>              matchTag_;
   edm::EDGetTokenT<pat::JetCollection>         matchTagPat_;
+  edm::EDGetTokenT<reco::JetView>              subjetGenTag_;
   edm::EDGetTokenT<reco::PFCandidateCollection>         pfCandidateLabel_;
   edm::EDGetTokenT<reco::TrackCollection>         trackTag_;
   edm::EDGetTokenT<reco::GenParticleCollection>         genParticleSrc_;
@@ -108,6 +110,7 @@ private:
   // edm::InputTag genParticleSrc_;
 
   std::string jetName_; //used as prefix for jet structures
+  edm::Handle<reco::JetView> gensubjets_;
   /* edm::EDGetTokenT< edm::ValueMap<float> > tokenGenTau1_; */
   /* edm::EDGetTokenT< edm::ValueMap<float> > tokenGenTau2_; */
   /* edm::EDGetTokenT< edm::ValueMap<float> > tokenGenTau3_; */
@@ -146,6 +149,7 @@ private:
   double jetPtMin_;
   bool doGenTaus_;
   bool doSubJets_;
+  bool doGenSubjet_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
@@ -385,6 +389,16 @@ private:
     float refparton_pt[MAXJETS];
     int refparton_flavor[MAXJETS];
     int refparton_flavorForB[MAXJETS];
+
+    float refptG[MAXJETS];
+    float refetaG[MAXJETS];
+    float refphiG[MAXJETS];
+    float refmG[MAXJETS];
+    std::vector<std::vector<float>> refSubJetPt;
+    std::vector<std::vector<float>> refSubJetEta;
+    std::vector<std::vector<float>> refSubJetPhi;
+    std::vector<std::vector<float>> refSubJetM;
+    
 
     float pthat;
     int beamId1, beamId2;

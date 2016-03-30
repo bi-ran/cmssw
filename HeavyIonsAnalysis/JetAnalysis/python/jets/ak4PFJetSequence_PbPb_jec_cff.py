@@ -9,6 +9,7 @@ from RecoJets.JetProducers.JetIDParams_cfi import *
 ak4PFmatch = patJetGenJetMatch.clone(
     src = cms.InputTag("ak4PFJets"),
     matched = cms.InputTag("ak4HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(False),
     maxDeltaR = 0.4
     )
 

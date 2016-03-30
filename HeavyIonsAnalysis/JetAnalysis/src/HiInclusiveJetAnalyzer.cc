@@ -441,6 +441,17 @@ HiInclusiveJetAnalyzer::beginJob() {
       t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
       t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
 
+      if(doGenSubjet_) {
+        t->Branch("genptG",jets_.genptG,"genptG[ngen]/F");
+        t->Branch("genetaG",jets_.genetaG,"genetaG[ngen]/F");
+        t->Branch("genphiG",jets_.genphiG,"genphiG[ngen]/F");
+        t->Branch("genmG",jets_.genmG,"genmG[ngen]/F");
+        t->Branch("genSubJetPt",&jets_.genSubJetPt);
+        t->Branch("genSubJetEta",&jets_.genSubJetEta);
+        t->Branch("genSubJetPhi",&jets_.genSubJetPhi);
+        t->Branch("genSubJetM",&jets_.genSubJetM);
+      }
+
       if(doSubEvent_){
 	t->Branch("gensubid",jets_.gensubid,"gensubid[ngen]/I");
       }
@@ -1120,7 +1131,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	  jets_.subid[jets_.nref] = gencon->collisionId();
 	}
 
-        if(doGenSubjet_) analyzeGenSubjets(*genjet);
+        if(doGenSubjet_) analyzeRefSubjets(*genjet);
 
       }else{
 	jets_.refpt[jets_.nref] = -999.;
@@ -1283,6 +1294,9 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
           jets_.gentau3[jets_.ngen] = tau3;
         }
 
+        if(doGenSubjet_)
+          analyzeGenSubjets(genjet);
+
 	if(doSubEvent_){
 	  const GenParticle* gencon = genjet.getGenConstituent(0);
 	  jets_.gensubid[jets_.ngen] = gencon->collisionId();
@@ -1293,16 +1307,9 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
   }
 
-
-
-
-
   t->Fill();
   memset(&jets_,0,sizeof jets_);
-
 }
-
-
 
 
 //--------------------------------------------------------------------------------------------------
@@ -1558,8 +1565,8 @@ void HiInclusiveJetAnalyzer::analyzeSubjets(const reco::Jet jet) {
   
 }
 
-void HiInclusiveJetAnalyzer::analyzeGenSubjets(const reco::GenJet jet) {
-
+//--------------------------------------------------------------------------------------------------
+int HiInclusiveJetAnalyzer::getGroomedGenJetIndex(const reco::GenJet jet) const {
   //Find closest soft-dropped gen jet
   double drMin = 100;
   int imatch = -1;
@@ -1572,15 +1579,26 @@ void HiInclusiveJetAnalyzer::analyzeGenSubjets(const reco::GenJet jet) {
       drMin = dr;
     }
   }
+  return imatch;
+}
+
+//--------------------------------------------------------------------------------------------------
+void HiInclusiveJetAnalyzer::analyzeRefSubjets(const reco::GenJet jet) {
+
+  //Find closest soft-dropped gen jet
+  int imatch = getGroomedGenJetIndex(jet);
+  double dr = 999.;
+  if(imatch>-1) {
+    const reco::Jet& mjet =  (*gensubjets_)[imatch];
+    dr = deltaR(jet,mjet);
+  }
 
   std::vector<float> sjpt;
   std::vector<float> sjeta;
   std::vector<float> sjphi;
   std::vector<float> sjm;
-
-  if(imatch>-1 && drMin<0.4) {
-    //this is the matched groomed jet
-    const reco::Jet& mjet = (*gensubjets_)[imatch];
+  if(imatch>-1 && dr<0.4) {
+    const reco::Jet& mjet =  (*gensubjets_)[imatch];
     jets_.refptG[jets_.nref]  = mjet.pt();
     jets_.refetaG[jets_.nref] = mjet.eta();
     jets_.refphiG[jets_.nref] = mjet.phi();
@@ -1612,6 +1630,59 @@ void HiInclusiveJetAnalyzer::analyzeGenSubjets(const reco::GenJet jet) {
   jets_.refSubJetEta.push_back(sjeta);
   jets_.refSubJetPhi.push_back(sjphi);
   jets_.refSubJetM.push_back(sjm);
+}
+
+//--------------------------------------------------------------------------------------------------
+void HiInclusiveJetAnalyzer::analyzeGenSubjets(const reco::GenJet jet) {
+  //Find closest soft-dropped gen jet
+  int imatch = getGroomedGenJetIndex(jet);
+  double dr = 999.;
+  if(imatch>-1) {
+    const reco::Jet& mjet =  (*gensubjets_)[imatch];
+    dr = deltaR(jet,mjet);
+  }
+
+  std::vector<float> sjpt;
+  std::vector<float> sjeta;
+  std::vector<float> sjphi;
+  std::vector<float> sjm;
+  std::vector<float> sjarea;
+  if(imatch>-1 && dr<0.4) {
+    const reco::Jet& mjet =  (*gensubjets_)[imatch];
+    jets_.genptG[jets_.ngen]  = mjet.pt();
+    jets_.genetaG[jets_.ngen] = mjet.eta();
+    jets_.genphiG[jets_.ngen] = mjet.phi();
+    jets_.genmG[jets_.ngen]   = mjet.mass();
+    
+    if(mjet.numberOfDaughters()>0) {
+      for (unsigned k = 0; k < mjet.numberOfDaughters(); ++k) {
+        const reco::Candidate & dp = *mjet.daughter(k);
+        sjpt.push_back(dp.pt());
+        sjeta.push_back(dp.eta());
+        sjphi.push_back(dp.phi());
+        sjm.push_back(dp.mass());
+        //sjarea.push_back(dp.castTo<reco::JetRef>()->jetArea());
+      }
+    }
+  }
+  else {
+    jets_.genptG[jets_.ngen]  = -999.;
+    jets_.genetaG[jets_.ngen] = -999.;
+    jets_.genphiG[jets_.ngen] = -999.;
+    jets_.genmG[jets_.ngen]   = -999.;
+    
+    sjpt.push_back(-999.);
+    sjeta.push_back(-999.);
+    sjphi.push_back(-999.);
+    sjm.push_back(-999.);
+    sjarea.push_back(-999.);
+  }
+
+  jets_.genSubJetPt.push_back(sjpt);
+  jets_.genSubJetEta.push_back(sjeta);
+  jets_.genSubJetPhi.push_back(sjphi);
+  jets_.genSubJetM.push_back(sjm);
+  jets_.genSubJetArea.push_back(sjarea);
 }
 
 DEFINE_FWK_MODULE(HiInclusiveJetAnalyzer);

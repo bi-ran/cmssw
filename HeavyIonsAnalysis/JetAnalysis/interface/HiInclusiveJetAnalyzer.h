@@ -82,6 +82,8 @@ private:
   int TaggedJet(reco::Jet calojet, edm::Handle<reco::JetTagCollection > jetTags );
   float getTau(unsigned num, const reco::GenJet object) const;
   void analyzeSubjets(const reco::Jet jet);
+  int  getGroomedGenJetIndex(const reco::GenJet jet) const;
+  void analyzeRefSubjets(const reco::GenJet jet);
   void analyzeGenSubjets(const reco::GenJet jet);
   
   
@@ -416,6 +418,16 @@ private:
     float gendrjt[MAXJETS];
     int gensubid[MAXJETS];
 
+    float genptG[MAXJETS];
+    float genetaG[MAXJETS];
+    float genphiG[MAXJETS];
+    float genmG[MAXJETS];
+    std::vector<std::vector<float>> genSubJetPt;
+    std::vector<std::vector<float>> genSubJetEta;
+    std::vector<std::vector<float>> genSubJetPhi;
+    std::vector<std::vector<float>> genSubJetM;
+    std::vector<std::vector<float>> genSubJetArea;
+    
     // hlt
     int nHLTBit;
     bool hltBit[MAXHLTBITS];

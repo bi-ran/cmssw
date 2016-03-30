@@ -9,6 +9,7 @@ from RecoJets.JetProducers.JetIDParams_cfi import *
 akVs3PFmatch = patJetGenJetMatch.clone(
     src = cms.InputTag("akVs3PFJets"),
     matched = cms.InputTag("ak3GenJets"),
+    resolveByMatchQuality = cms.bool(True),
     maxDeltaR = 0.3
     )
 

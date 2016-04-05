@@ -197,7 +197,7 @@ ALGO_SUB_GROOM_RADIUS_OBJECT_JetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = c
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(DOTOWERS_),
 							     doSubJets = cms.untracked.bool(DOSUBJETS_),
-                                                             doSubJets = cms.untracked.bool(DOGENSUBJETS_),     
+                                                             doGenSubJets = cms.untracked.bool(DOGENSUBJETS_),     
                                                              subjetGenTag = cms.untracked.InputTag("ALGO_GROOM_RADIUS_GENJETS"),
                                                              doGenTaus = ISMC
                                                              )

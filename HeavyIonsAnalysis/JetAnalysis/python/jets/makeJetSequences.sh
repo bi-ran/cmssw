@@ -87,7 +87,7 @@ do
                             
 			    if [ $groom == "SoftDrop" ] || [ $groom == "Filter" ]; then
 			        doSubJets="True"
-                                if [ $sample == "mc" ]; then
+                                if [ $sample == "mc" ] && [ $groom == "SoftDrop" ]; then
                                     doGenSubJets="True"
                                 fi
 			    fi

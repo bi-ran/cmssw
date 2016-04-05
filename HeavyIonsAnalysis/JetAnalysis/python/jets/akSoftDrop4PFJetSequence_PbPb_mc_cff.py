@@ -197,7 +197,7 @@ akSoftDrop4PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akS
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
 							     doSubJets = cms.untracked.bool(True),
-                                                             doSubJets = cms.untracked.bool(True),     
+                                                             doGenSubJets = cms.untracked.bool(True),     
                                                              subjetGenTag = cms.untracked.InputTag("akSoftDrop4HiGenJets"),
                                                              doGenTaus = True
                                                              )

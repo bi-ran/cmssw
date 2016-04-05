@@ -197,7 +197,7 @@ akPuSoftDrop6CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag(
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
 							     doSubJets = cms.untracked.bool(True),
-                                                             doSubJets = cms.untracked.bool(True),     
+                                                             doGenSubJets = cms.untracked.bool(True),     
                                                              subjetGenTag = cms.untracked.InputTag("akSoftDrop6HiGenJets"),
                                                              doGenTaus = True
                                                              )

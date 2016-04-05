@@ -197,7 +197,7 @@ akVsFilter3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akV
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
 							     doSubJets = cms.untracked.bool(True),
-                                                             doSubJets = cms.untracked.bool(True),     
+                                                             doGenSubJets = cms.untracked.bool(False),     
                                                              subjetGenTag = cms.untracked.InputTag("akFilter3GenJets"),
                                                              doGenTaus = True
                                                              )

@@ -198,7 +198,7 @@ ALGO_SUB_GROOM_RADIUS_OBJECT_JetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = c
 							     doTower = cms.untracked.bool(DOTOWERS_),
 							     doSubJets = cms.untracked.bool(DOSUBJETS_),
                                                              doGenSubJets = cms.untracked.bool(DOGENSUBJETS_),     
-                                                             subjetGenTag = cms.untracked.InputTag("ALGO_GROOM_RADIUS_GENJETS"),
+                                                             subjetGenTag = cms.untracked.InputTag("ALGO_GROOM_RADIUS_GenJets"),
                                                              doGenTaus = ISMC
                                                              )
 
@@ -223,7 +223,7 @@ ALGO_SUB_GROOM_RADIUS_OBJECT_JetSequence_mc = cms.Sequence(
                                                   *
                                                   ALGO_SUB_GROOM_RADIUS_OBJECT_JetBtagging
                                                   *
-                                                  ALGO_SUB_GROOM_RADIUS_OBJECT_Njettiness
+                                                  ALGO_SUB_GROOM_RADIUS_OBJECT_Njettiness #No constituents for calo jets in pp. Must be removed for pp calo jets but I'm not sure how to do this transparently (Marta)
                                                   *
                                                   ALGO_SUB_GROOM_RADIUS_OBJECT_patJetsWithBtagging
                                                   *

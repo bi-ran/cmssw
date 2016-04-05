@@ -198,7 +198,7 @@ akPu5PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akPu5PFpa
 							     doTower = cms.untracked.bool(True),
 							     doSubJets = cms.untracked.bool(False),
                                                              doGenSubJets = cms.untracked.bool(False),     
-                                                             subjetGenTag = cms.untracked.InputTag("ak5HiGenJets"),
+                                                             subjetGenTag = cms.untracked.InputTag("ak5GenJets"),
                                                              doGenTaus = False
                                                              )
 

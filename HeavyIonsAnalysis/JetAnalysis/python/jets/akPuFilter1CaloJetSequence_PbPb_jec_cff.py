@@ -198,7 +198,7 @@ akPuFilter1CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("a
 							     doTower = cms.untracked.bool(True),
 							     doSubJets = cms.untracked.bool(True),
                                                              doGenSubJets = cms.untracked.bool(False),     
-                                                             subjetGenTag = cms.untracked.InputTag("akFilter1HiGenJets"),
+                                                             subjetGenTag = cms.untracked.InputTag("akFilter1GenJets"),
                                                              doGenTaus = True
                                                              )
 

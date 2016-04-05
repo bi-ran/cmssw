@@ -14,6 +14,13 @@ ak2Calomatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.2
     )
 
+ak2CalomatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak2HiGenJets"),
+    matched = cms.InputTag("ak2HiCleanedGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.2
+    )
+
 ak2Caloparton = patJetPartonMatch.clone(src = cms.InputTag("ak2CaloJets")
                                                         )
 
@@ -186,16 +193,21 @@ ak2CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak2Calopa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak2Calo"),
                                                              jetName = cms.untracked.string("ak2Calo"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak2HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 ak2CaloJetSequence_mc = cms.Sequence(
                                                   #ak2Caloclean
                                                   #*
                                                   ak2Calomatch
+                                                  #*
+                                                  #ak2CalomatchGroomed
                                                   *
                                                   ak2Caloparton
                                                   *

@@ -14,6 +14,13 @@ akVs4PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.4
     )
 
+akVs4PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak4GenJets"),
+    matched = cms.InputTag("ak4GenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.4
+    )
+
 akVs4PFparton = patJetPartonMatch.clone(src = cms.InputTag("akVs4PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akVs4PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs4PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akVs4PF"),
                                                              jetName = cms.untracked.string("akVs4PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak4GenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akVs4PFJetSequence_mc = cms.Sequence(
                                                   #akVs4PFclean
                                                   #*
                                                   akVs4PFmatch
+                                                  #*
+                                                  #akVs4PFmatchGroomed
                                                   *
                                                   akVs4PFparton
                                                   *

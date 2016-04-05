@@ -14,6 +14,13 @@ akCsFilter5PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.5
     )
 
+akCsFilter5PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("akFilter5HiGenJets"),
+    matched = cms.InputTag("ak5HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.5
+    )
+
 akCsFilter5PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCsFilter5PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCsFilter5PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akC
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCsFilter5PF"),
                                                              jetName = cms.untracked.string("akCsFilter5PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(True)
+							     doSubJets = cms.untracked.bool(True),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("akFilter5HiGenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akCsFilter5PFJetSequence_mc = cms.Sequence(
                                                   #akCsFilter5PFclean
                                                   #*
                                                   akCsFilter5PFmatch
+                                                  #*
+                                                  #akCsFilter5PFmatchGroomed
                                                   *
                                                   akCsFilter5PFparton
                                                   *

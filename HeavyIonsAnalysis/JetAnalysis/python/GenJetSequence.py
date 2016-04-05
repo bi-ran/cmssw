@@ -4,6 +4,8 @@ from RecoHI.HiJetAlgos.HiGenJets_cff import *
 from RecoJets.Configuration.GenJetParticles_cff import *
 from RecoHI.HiJetAlgos.HiSignalParticleProducer_cfi import hiSignalGenParticles
 from HeavyIonsAnalysis.JetAnalysis.akSoftDrop4GenJets_cfi import akSoftDrop4GenJets
+
+hiSignalGenParticles.src          = cms.InputTag('genParticlesForJets')
 akSoftDrop4GenJets.src            = cms.InputTag("hiSignalGenParticles")
 
 akSoftDrop1GenJets = akSoftDrop4GenJets.clone(rParam = 0.1)

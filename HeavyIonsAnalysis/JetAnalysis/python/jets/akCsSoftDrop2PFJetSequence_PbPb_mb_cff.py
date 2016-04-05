@@ -14,6 +14,13 @@ akCsSoftDrop2PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.2
     )
 
+akCsSoftDrop2PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("akSoftDrop2HiGenJets"),
+    matched = cms.InputTag("ak2HiCleanedGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.2
+    )
+
 akCsSoftDrop2PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCsSoftDrop2PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCsSoftDrop2PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("a
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCsSoftDrop2PF"),
                                                              jetName = cms.untracked.string("akCsSoftDrop2PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(True)
+							     doSubJets = cms.untracked.bool(True),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("akSoftDrop2HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akCsSoftDrop2PFJetSequence_mc = cms.Sequence(
                                                   #akCsSoftDrop2PFclean
                                                   #*
                                                   akCsSoftDrop2PFmatch
+                                                  #*
+                                                  #akCsSoftDrop2PFmatchGroomed
                                                   *
                                                   akCsSoftDrop2PFparton
                                                   *

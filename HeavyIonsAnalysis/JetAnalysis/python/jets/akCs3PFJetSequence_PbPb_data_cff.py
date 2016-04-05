@@ -14,6 +14,13 @@ akCs3PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.3
     )
 
+akCs3PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak3HiGenJets"),
+    matched = cms.InputTag("ak3HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.3
+    )
+
 akCs3PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCs3PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCs3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akCs3PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCs3PF"),
                                                              jetName = cms.untracked.string("akCs3PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak3HiGenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akCs3PFJetSequence_mc = cms.Sequence(
                                                   #akCs3PFclean
                                                   #*
                                                   akCs3PFmatch
+                                                  #*
+                                                  #akCs3PFmatchGroomed
                                                   *
                                                   akCs3PFparton
                                                   *

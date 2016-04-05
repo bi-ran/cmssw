@@ -14,6 +14,13 @@ ak6PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.6
     )
 
+ak6PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak6HiGenJets"),
+    matched = cms.InputTag("ak6HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.6
+    )
+
 ak6PFparton = patJetPartonMatch.clone(src = cms.InputTag("ak6PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ ak6PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJet
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak6PF"),
                                                              jetName = cms.untracked.string("ak6PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak6HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 ak6PFJetSequence_mc = cms.Sequence(
                                                   #ak6PFclean
                                                   #*
                                                   ak6PFmatch
+                                                  #*
+                                                  #ak6PFmatchGroomed
                                                   *
                                                   ak6PFparton
                                                   *

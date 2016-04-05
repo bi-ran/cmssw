@@ -5,9 +5,17 @@ from HeavyIonsAnalysis.JetAnalysis.patHeavyIonSequences_cff import patJetGenJetM
 from HeavyIonsAnalysis.JetAnalysis.inclusiveJetAnalyzer_cff import *
 from HeavyIonsAnalysis.JetAnalysis.bTaggers_cff import *
 from RecoJets.JetProducers.JetIDParams_cfi import *
+from RecoJets.JetProducers.nJettinessAdder_cfi import Njettiness
 
 ak2PFmatch = patJetGenJetMatch.clone(
     src = cms.InputTag("ak2PFJets"),
+    matched = cms.InputTag("ak2HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.2
+    )
+
+ak2PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak2HiGenJets"),
     matched = cms.InputTag("ak2HiSignalGenJets"),
     resolveByMatchQuality = cms.bool(False),
     maxDeltaR = 0.2
@@ -162,6 +170,12 @@ ak2PFpatJetsWithBtagging = patJets.clone(jetSource = cms.InputTag("ak2PFJets"),
         # embedPFCandidates = True
         )
 
+ak2PFNjettiness = Njettiness.clone(
+		    src = cms.InputTag("ak2PFJets"),
+           	    R0  = cms.double( 0.2)
+)
+ak2PFpatJetsWithBtagging.userData.userFloats.src += ['ak2PFNjettiness:tau1','ak2PFNjettiness:tau2','ak2PFNjettiness:tau3']
+
 ak2PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJetsWithBtagging"),
                                                              genjetTag = 'ak2HiGenJets',
                                                              rParam = 0.2,
@@ -178,16 +192,22 @@ ak2PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJet
                                                              doLifeTimeTagging = cms.untracked.bool(True),
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak2PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             jetName = cms.untracked.string("ak2PF"),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak2HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 ak2PFJetSequence_mc = cms.Sequence(
                                                   #ak2PFclean
                                                   #*
                                                   ak2PFmatch
+                                                  #*
+                                                  #ak2PFmatchGroomed
                                                   *
                                                   ak2PFparton
                                                   *
@@ -203,6 +223,8 @@ ak2PFJetSequence_mc = cms.Sequence(
                                                   *
                                                   ak2PFJetBtagging
                                                   *
+                                                  ak2PFNjettiness
+                                                  *
                                                   ak2PFpatJetsWithBtagging
                                                   *
                                                   ak2PFJetAnalyzer
@@ -215,6 +237,8 @@ ak2PFJetSequence_data = cms.Sequence(ak2PFcorr
                                                     ak2PFJetTracksAssociatorAtVertex
                                                     *
                                                     ak2PFJetBtagging
+                                                    *
+                                                    ak2PFNjettiness 
                                                     *
                                                     ak2PFpatJetsWithBtagging
                                                     *

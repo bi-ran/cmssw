@@ -14,6 +14,13 @@ akVs3PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.3
     )
 
+akVs3PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak3HiGenJets"),
+    matched = cms.InputTag("ak3HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.3
+    )
+
 akVs3PFparton = patJetPartonMatch.clone(src = cms.InputTag("akVs3PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akVs3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs3PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akVs3PF"),
                                                              jetName = cms.untracked.string("akVs3PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak3HiGenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akVs3PFJetSequence_mc = cms.Sequence(
                                                   #akVs3PFclean
                                                   #*
                                                   akVs3PFmatch
+                                                  #*
+                                                  #akVs3PFmatchGroomed
                                                   *
                                                   akVs3PFparton
                                                   *

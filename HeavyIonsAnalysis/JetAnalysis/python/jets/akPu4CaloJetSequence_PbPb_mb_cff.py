@@ -14,6 +14,13 @@ akPu4Calomatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.4
     )
 
+akPu4CalomatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak4HiGenJets"),
+    matched = cms.InputTag("ak4HiCleanedGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.4
+    )
+
 akPu4Caloparton = patJetPartonMatch.clone(src = cms.InputTag("akPu4CaloJets")
                                                         )
 
@@ -186,16 +193,21 @@ akPu4CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akPu4Ca
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akPu4Calo"),
                                                              jetName = cms.untracked.string("akPu4Calo"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak4HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akPu4CaloJetSequence_mc = cms.Sequence(
                                                   #akPu4Caloclean
                                                   #*
                                                   akPu4Calomatch
+                                                  #*
+                                                  #akPu4CalomatchGroomed
                                                   *
                                                   akPu4Caloparton
                                                   *

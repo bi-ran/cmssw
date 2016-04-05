@@ -14,6 +14,13 @@ akVs1PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.1
     )
 
+akVs1PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak1GenJets"),
+    matched = cms.InputTag("ak1GenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.1
+    )
+
 akVs1PFparton = patJetPartonMatch.clone(src = cms.InputTag("akVs1PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akVs1PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs1PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akVs1PF"),
                                                              jetName = cms.untracked.string("akVs1PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak1GenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akVs1PFJetSequence_mc = cms.Sequence(
                                                   #akVs1PFclean
                                                   #*
                                                   akVs1PFmatch
+                                                  #*
+                                                  #akVs1PFmatchGroomed
                                                   *
                                                   akVs1PFparton
                                                   *

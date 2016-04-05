@@ -14,6 +14,13 @@ ak3PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.3
     )
 
+ak3PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak3HiGenJets"),
+    matched = cms.InputTag("ak3HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.3
+    )
+
 ak3PFparton = patJetPartonMatch.clone(src = cms.InputTag("ak3PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ ak3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJet
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak3PF"),
                                                              jetName = cms.untracked.string("ak3PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak3HiGenJets"),
+                                                             doGenTaus = False
                                                              )
 
 ak3PFJetSequence_mc = cms.Sequence(
                                                   #ak3PFclean
                                                   #*
                                                   ak3PFmatch
+                                                  #*
+                                                  #ak3PFmatchGroomed
                                                   *
                                                   ak3PFparton
                                                   *

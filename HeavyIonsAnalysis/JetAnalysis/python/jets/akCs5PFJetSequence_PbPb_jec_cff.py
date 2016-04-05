@@ -14,6 +14,13 @@ akCs5PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.5
     )
 
+akCs5PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak5HiGenJets"),
+    matched = cms.InputTag("ak5HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.5
+    )
+
 akCs5PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCs5PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCs5PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akCs5PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCs5PF"),
                                                              jetName = cms.untracked.string("akCs5PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak5HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akCs5PFJetSequence_mc = cms.Sequence(
                                                   #akCs5PFclean
                                                   #*
                                                   akCs5PFmatch
+                                                  #*
+                                                  #akCs5PFmatchGroomed
                                                   *
                                                   akCs5PFparton
                                                   *

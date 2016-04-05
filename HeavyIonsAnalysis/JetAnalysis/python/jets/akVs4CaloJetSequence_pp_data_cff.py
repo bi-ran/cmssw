@@ -14,6 +14,13 @@ akVs4Calomatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.4
     )
 
+akVs4CalomatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak4GenJets"),
+    matched = cms.InputTag("ak4GenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.4
+    )
+
 akVs4Caloparton = patJetPartonMatch.clone(src = cms.InputTag("akVs4CaloJets")
                                                         )
 
@@ -186,16 +193,21 @@ akVs4CaloJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs4Ca
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akVs4Calo"),
                                                              jetName = cms.untracked.string("akVs4Calo"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak4GenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akVs4CaloJetSequence_mc = cms.Sequence(
                                                   #akVs4Caloclean
                                                   #*
                                                   akVs4Calomatch
+                                                  #*
+                                                  #akVs4CalomatchGroomed
                                                   *
                                                   akVs4Caloparton
                                                   *

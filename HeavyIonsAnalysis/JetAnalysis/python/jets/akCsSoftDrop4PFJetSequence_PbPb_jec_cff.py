@@ -14,6 +14,13 @@ akCsSoftDrop4PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.4
     )
 
+akCsSoftDrop4PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("akSoftDrop4HiGenJets"),
+    matched = cms.InputTag("ak4HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.4
+    )
+
 akCsSoftDrop4PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCsSoftDrop4PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCsSoftDrop4PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("a
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCsSoftDrop4PF"),
                                                              jetName = cms.untracked.string("akCsSoftDrop4PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(True)
+							     doSubJets = cms.untracked.bool(True),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("akSoftDrop4HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akCsSoftDrop4PFJetSequence_mc = cms.Sequence(
                                                   #akCsSoftDrop4PFclean
                                                   #*
                                                   akCsSoftDrop4PFmatch
+                                                  #*
+                                                  #akCsSoftDrop4PFmatchGroomed
                                                   *
                                                   akCsSoftDrop4PFparton
                                                   *

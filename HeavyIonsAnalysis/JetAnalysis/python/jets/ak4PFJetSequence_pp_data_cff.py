@@ -14,6 +14,13 @@ ak4PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.4
     )
 
+ak4PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak4GenJets"),
+    matched = cms.InputTag("ak4GenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.4
+    )
+
 ak4PFparton = patJetPartonMatch.clone(src = cms.InputTag("ak4PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ ak4PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJet
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak4PF"),
                                                              jetName = cms.untracked.string("ak4PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak4GenJets"),
+                                                             doGenTaus = False
                                                              )
 
 ak4PFJetSequence_mc = cms.Sequence(
                                                   #ak4PFclean
                                                   #*
                                                   ak4PFmatch
+                                                  #*
+                                                  #ak4PFmatchGroomed
                                                   *
                                                   ak4PFparton
                                                   *

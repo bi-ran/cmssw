@@ -14,6 +14,13 @@ akCsFilter3PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.3
     )
 
+akCsFilter3PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("akFilter3HiGenJets"),
+    matched = cms.InputTag("ak3HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.3
+    )
+
 akCsFilter3PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCsFilter3PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCsFilter3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akC
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCsFilter3PF"),
                                                              jetName = cms.untracked.string("akCsFilter3PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(True)
+							     doSubJets = cms.untracked.bool(True),
+                                                             doSubJets = cms.untracked.bool(True),     
+                                                             subjetGenTag = cms.untracked.InputTag("akFilter3HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akCsFilter3PFJetSequence_mc = cms.Sequence(
                                                   #akCsFilter3PFclean
                                                   #*
                                                   akCsFilter3PFmatch
+                                                  #*
+                                                  #akCsFilter3PFmatchGroomed
                                                   *
                                                   akCsFilter3PFparton
                                                   *

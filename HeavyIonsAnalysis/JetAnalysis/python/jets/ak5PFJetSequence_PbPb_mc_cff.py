@@ -14,6 +14,13 @@ ak5PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.5
     )
 
+ak5PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak5HiGenJets"),
+    matched = cms.InputTag("ak5HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.5
+    )
+
 ak5PFparton = patJetPartonMatch.clone(src = cms.InputTag("ak5PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ ak5PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJet
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("ak5PF"),
                                                              jetName = cms.untracked.string("ak5PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak5HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 ak5PFJetSequence_mc = cms.Sequence(
                                                   #ak5PFclean
                                                   #*
                                                   ak5PFmatch
+                                                  #*
+                                                  #ak5PFmatchGroomed
                                                   *
                                                   ak5PFparton
                                                   *

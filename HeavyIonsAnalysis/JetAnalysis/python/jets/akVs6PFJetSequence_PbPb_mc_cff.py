@@ -14,6 +14,13 @@ akVs6PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.6
     )
 
+akVs6PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak6HiGenJets"),
+    matched = cms.InputTag("ak6HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.6
+    )
+
 akVs6PFparton = patJetPartonMatch.clone(src = cms.InputTag("akVs6PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akVs6PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akVs6PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akVs6PF"),
                                                              jetName = cms.untracked.string("akVs6PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak6HiGenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akVs6PFJetSequence_mc = cms.Sequence(
                                                   #akVs6PFclean
                                                   #*
                                                   akVs6PFmatch
+                                                  #*
+                                                  #akVs6PFmatchGroomed
                                                   *
                                                   akVs6PFparton
                                                   *

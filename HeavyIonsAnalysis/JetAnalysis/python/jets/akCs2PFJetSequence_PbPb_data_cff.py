@@ -14,6 +14,13 @@ akCs2PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.2
     )
 
+akCs2PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak2HiGenJets"),
+    matched = cms.InputTag("ak2HiSignalGenJets"),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = 0.2
+    )
+
 akCs2PFparton = patJetPartonMatch.clone(src = cms.InputTag("akCs2PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akCs2PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akCs2PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akCs2PF"),
                                                              jetName = cms.untracked.string("akCs2PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(True),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak2HiGenJets"),
+                                                             doGenTaus = False
                                                              )
 
 akCs2PFJetSequence_mc = cms.Sequence(
                                                   #akCs2PFclean
                                                   #*
                                                   akCs2PFmatch
+                                                  #*
+                                                  #akCs2PFmatchGroomed
                                                   *
                                                   akCs2PFparton
                                                   *

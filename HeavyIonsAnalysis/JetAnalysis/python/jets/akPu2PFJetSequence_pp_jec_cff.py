@@ -14,6 +14,13 @@ akPu2PFmatch = patJetGenJetMatch.clone(
     maxDeltaR = 0.2
     )
 
+akPu2PFmatchGroomed = patJetGenJetMatch.clone(
+    src = cms.InputTag("ak2GenJets"),
+    matched = cms.InputTag("ak2GenJets"),
+    resolveByMatchQuality = cms.bool(False),
+    maxDeltaR = 0.2
+    )
+
 akPu2PFparton = patJetPartonMatch.clone(src = cms.InputTag("akPu2PFJets")
                                                         )
 
@@ -186,16 +193,21 @@ akPu2PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("akPu2PFpa
                                                              doLifeTimeTaggingExtras = cms.untracked.bool(False),
                                                              bTagJetName = cms.untracked.string("akPu2PF"),
                                                              jetName = cms.untracked.string("akPu2PF"),
-                                                             genPtMin = cms.untracked.double(15),
+                                                             genPtMin = cms.untracked.double(5),
                                                              hltTrgResults = cms.untracked.string('TriggerResults::'+'HISIGNAL'),
 							     doTower = cms.untracked.bool(False),
-							     doSubJets = cms.untracked.bool(False)
+							     doSubJets = cms.untracked.bool(False),
+                                                             doSubJets = cms.untracked.bool(False),     
+                                                             subjetGenTag = cms.untracked.InputTag("ak2GenJets"),
+                                                             doGenTaus = True
                                                              )
 
 akPu2PFJetSequence_mc = cms.Sequence(
                                                   #akPu2PFclean
                                                   #*
                                                   akPu2PFmatch
+                                                  #*
+                                                  #akPu2PFmatchGroomed
                                                   *
                                                   akPu2PFparton
                                                   *

@@ -151,7 +151,7 @@ private:
   double jetPtMin_;
   bool doGenTaus_;
   bool doSubJets_;
-  bool doGenSubjet_;
+  bool doGenSubJets_;
 
   TTree *t;
   edm::Service<TFileService> fs1;

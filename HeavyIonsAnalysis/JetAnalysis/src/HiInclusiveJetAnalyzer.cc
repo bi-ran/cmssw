@@ -69,7 +69,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   jetName_ = iConfig.getUntrackedParameter<string>("jetName");
   doGenTaus_ = iConfig.getUntrackedParameter<bool>("doGenTaus",0);
   doSubJets_ = iConfig.getUntrackedParameter<bool>("doSubJets",0);
-  doGenSubjet_ = iConfig.getUntrackedParameter<bool>("doGenSubjet",false);
+  doGenSubJets_ = iConfig.getUntrackedParameter<bool>("doGenSubJets",false);
   subjetGenTag_ = consumes<reco::JetView> (iConfig.getUntrackedParameter<InputTag>("subjetGenTag"));
 
   // useGenTaus = true;
@@ -404,7 +404,7 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("refparton_flavor",jets_.refparton_flavor,"refparton_flavor[nref]/I");
     t->Branch("refparton_flavorForB",jets_.refparton_flavorForB,"refparton_flavorForB[nref]/I");
 
-    if(doGenSubjet_) {
+    if(doGenSubJets_) {
       t->Branch("refptG",jets_.refptG,"refptG[nref]/F");
       t->Branch("refetaG",jets_.refetaG,"refetaG[nref]/F");
       t->Branch("refphiG",jets_.refphiG,"refphiG[nref]/F");
@@ -441,7 +441,7 @@ HiInclusiveJetAnalyzer::beginJob() {
       t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
       t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
 
-      if(doGenSubjet_) {
+      if(doGenSubJets_) {
         t->Branch("genptG",jets_.genptG,"genptG[ngen]/F");
         t->Branch("genetaG",jets_.genetaG,"genetaG[ngen]/F");
         t->Branch("genphiG",jets_.genphiG,"genphiG[ngen]/F");
@@ -542,7 +542,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
   edm::Handle<reco::JetView> matchedjets;
   iEvent.getByToken(matchTag_, matchedjets);
 
-  if(doGenSubjet_)
+  if(doGenSubJets_)
     iEvent.getByToken(subjetGenTag_, gensubjets_);
   
   edm::Handle<reco::JetView> jets;
@@ -1131,7 +1131,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	  jets_.subid[jets_.nref] = gencon->collisionId();
 	}
 
-        if(doGenSubjet_) analyzeRefSubjets(*genjet);
+        if(doGenSubJets_) analyzeRefSubjets(*genjet);
 
       }else{
 	jets_.refpt[jets_.nref] = -999.;
@@ -1143,7 +1143,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	jets_.refdphijt[jets_.nref] = -999.;
 	jets_.refdrjt[jets_.nref] = -999.;
 
-        if(doGenSubjet_) {
+        if(doGenSubJets_) {
           jets_.refptG[jets_.nref]  = -999.;
           jets_.refetaG[jets_.nref] = -999.;
           jets_.refphiG[jets_.nref] = -999.;
@@ -1294,7 +1294,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
           jets_.gentau3[jets_.ngen] = tau3;
         }
 
-        if(doGenSubjet_)
+        if(doGenSubJets_)
           analyzeGenSubjets(genjet);
 
 	if(doSubEvent_){

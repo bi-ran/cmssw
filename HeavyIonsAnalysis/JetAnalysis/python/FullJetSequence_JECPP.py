@@ -52,18 +52,19 @@ highPurityTracks = cms.EDFilter("TrackSelector",
 jetSequences = cms.Sequence(
     akGenJets +
     ppReRecoPFJets +
-    ppReRecoCaloJets +
+#    ppReRecoCaloJets +
     makePartons +
     highPurityTracks +
-    ak1PFJetSequence +
-    ak1CaloJetSequence +
+    #ak1PFJetSequence +
+    #ak1CaloJetSequence +
     ak2PFJetSequence +
-    ak2CaloJetSequence +
+    #ak2CaloJetSequence +
     ak3PFJetSequence +
-    ak3CaloJetSequence +
+    #ak3CaloJetSequence +
     ak4PFJetSequence +
     ak4CaloJetSequence +
     ak5PFJetSequence +
-    ak5CaloJetSequence +
-    ak6PFJetSequence +
-    ak6CaloJetSequence)
+    #ak5CaloJetSequence +
+    ak6PFJetSequence #+
+    #ak6CaloJetSequence
+    )

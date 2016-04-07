@@ -72,9 +72,8 @@ process.TFileService = cms.Service("TFileService",
 #############################
 
 process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_nominalPP")
-
 # Use this version for JEC
-# process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPP")
+#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPP")
 
 #####################################################################################
 

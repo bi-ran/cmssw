@@ -85,8 +85,8 @@ private:
   int  getGroomedGenJetIndex(const reco::GenJet jet) const;
   void analyzeRefSubjets(const reco::GenJet jet);
   void analyzeGenSubjets(const reco::GenJet jet);
-  
-  
+  float getAboveCharmThresh(reco::TrackRefVector& selTracks, const reco::TrackIPTagInfo& ipData, int sigOrVal);
+ 
   std::auto_ptr<fastjet::contrib::Njettiness>   routine_;
   
   // edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_, trackTag_, matchTag_;
@@ -142,6 +142,7 @@ private:
   bool doLifeTimeTaggingExtras_;
   bool saveBfragments_;
   bool skipCorrections_;
+  bool doExtraCTagging_;
 
   bool doHiJetID_;
   bool doStandardJetID_;
@@ -342,6 +343,10 @@ private:
     float svtxpt[MAXJETS];
     float svtxmcorr[MAXJETS];
     float svtxnormchi2[MAXJETS];
+    float svJetDeltaR[MAXJETS];
+    float svtxTrkSumChi2[MAXJETS];
+    int svtxTrkNetCharge[MAXJETS];
+    int svtxNtrkInCone[MAXJETS];
 
     int nIPtrk[MAXJETS];
     int nselIPtrk[MAXJETS];
@@ -366,6 +371,18 @@ private:
     float ipDist2Jet[MAXTRACKS];
     float ipDist2JetSig[MAXTRACKS];
     float ipClosest2Jet[MAXTRACKS];
+  
+    float trackPtRel[MAXTRACKS];
+    float trackPtRatio[MAXTRACKS];
+    float trackPPar[MAXTRACKS];
+    float trackPParRatio[MAXTRACKS];
+    float trackDeltaR[MAXTRACKS];
+
+    float trackSip2dSigAboveCharm[MAXJETS];
+    float trackSip2dValAboveCharm[MAXJETS];
+    float trackSip3dValAboveCharm[MAXJETS];
+    float trackSip3dSigAboveCharm[MAXJETS];
+    float trackSumJetDeltaR[MAXJETS];
 
     float mue[MAXJETS];
     float mupt[MAXJETS];

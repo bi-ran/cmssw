@@ -39,6 +39,8 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMap.h"
 #include "L1Trigger/GlobalTrigger/plugins/L1GlobalTrigger.h"
 
+#include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
+
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 
@@ -123,6 +125,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   // EESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEE"));
   // HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
   // HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
+  doExtraCTagging_ = iConfig.getUntrackedParameter<bool>("doExtraCTagging",false);
 
   genParticleSrc_ = consumes<reco::GenParticleCollection> (iConfig.getUntrackedParameter<edm::InputTag>("genParticles",edm::InputTag("hiGenParticles")));
 
@@ -366,6 +369,27 @@ HiInclusiveJetAnalyzer::beginJob() {
       t->Branch("ipDist2Jet",jets_.ipDist2Jet,"ipDist2Jet[nIP]/F");
       t->Branch("ipDist2JetSig",jets_.ipDist2JetSig,"ipDist2JetSig[nIP]/F");
       t->Branch("ipClosest2Jet",jets_.ipClosest2Jet,"ipClosest2Jet[nIP]/F");
+      if(doExtraCTagging_){
+	      t->Branch("trackPtRel",jets_.trackPtRel,"trackPtRel[nIP]/F");
+	      t->Branch("trackPPar",jets_.trackPPar,"trackPPar[nIP]/F");
+	      t->Branch("trackPParRatio",jets_.trackPParRatio,"trackPParRatio[nIP]/F");
+	      t->Branch("trackDeltaR",jets_.trackDeltaR,"trackDeltaR[nIP]/F");
+	      t->Branch("trackPtRatio",jets_.trackPtRatio,"trackPtRatio[nIP]/F");
+	      t->Branch("trackSumJetDeltaR",jets_.trackSumJetDeltaR,"trackSumJetDeltaR[nref]/F");
+      }
+
+    }
+
+    if (doExtraCTagging_){
+	    t->Branch("svtxTrkSumChi2", jets_.svtxTrkSumChi2,"svtxTrkSumChi2[nref]/F");
+	    t->Branch("svtxTrkNetCharge",jets_.svtxTrkNetCharge,"svtxTrkNetCharge[nref]/I");
+	    t->Branch("svtxNtrkInCone",jets_.svtxNtrkInCone,"svtxNtrkInCone[nref]/I");
+
+	    t->Branch("svJetDeltaR", jets_.svJetDeltaR, "svJetDeltaR[nref]/F");
+	    t->Branch("trackSip2dSigAboveCharm",jets_.trackSip2dSigAboveCharm, "trackSip2dSigAboveCharm[nref]/F");
+	    t->Branch("trackSip3dSigAboveCharm",jets_.trackSip3dSigAboveCharm, "trackSip3dSigAboveCharm[nref]/F");
+	    t->Branch("trackSip2dValAboveCharm",jets_.trackSip2dValAboveCharm, "trackSip2dValAboveCharm[nref]/F");
+	    t->Branch("trackSip3dValAboveCharm",jets_.trackSip3dValAboveCharm, "trackSip3dValAboveCharm[nref]/F");
 
     }
 
@@ -648,6 +672,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
       jets_.rawpt[jets_.nref]=(*patjets)[j].correctedJet("Uncorrected").pt();
     }
 
+    math::XYZVector jetDir = jet.momentum().Unit();
+
     if(doLifeTimeTagging_){
       int ith_tagged =    this->TaggedJet(jet,jetTags_SvtxHighEff);
       if(ith_tagged >= 0){
@@ -658,6 +684,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	if ( jets_.nsvtx[jets_.nref] > 0) {
 
 	  jets_.svtxntrk[jets_.nref]  = tagInfoSV.nVertexTracks(0);
+	  jets_.svJetDeltaR[jets_.nref] = reco::deltaR(tagInfoSV.flightDirection(0),jetDir);
 
 	  // this is the 3d flight distance, for 2-D use (0,true)
 	  Measurement1D m1D = tagInfoSV.flightDistance(0);
@@ -672,7 +699,22 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
           double svtxPt = svtx.p4().pt();
 	  jets_.svtxm[jets_.nref]    = svtxM; 
 	  jets_.svtxpt[jets_.nref]   = svtxPt;
-	  
+	 
+	  double trkSumChi2=0;
+          int trkNetCharge=0;
+          int nTrkInCone=0;
+          int nsvtxtrks=0;
+          TrackRefVector svtxTracks = tagInfoSV.vertexTracks(0);
+          for(unsigned int itrk=0; itrk<svtxTracks.size(); itrk++){
+              nsvtxtrks++;
+              trkSumChi2 += svtxTracks.at(itrk)->chi2();
+              trkNetCharge += svtxTracks.at(itrk)->charge();
+              if(reco::deltaR(svtxTracks.at(itrk)->momentum(),jetDir)<rParam) nTrkInCone++;
+          }
+          jets_.svtxTrkSumChi2[jets_.nref] = trkSumChi2;
+          jets_.svtxTrkNetCharge[jets_.nref] = trkNetCharge;
+          jets_.svtxNtrkInCone[jets_.nref] = nTrkInCone;
+ 
 	  //try out the corrected mass (http://arxiv.org/pdf/1504.07670v1.pdf)
 	  //mCorr=srqt(m^2+p^2sin^2(th)) + p*sin(th)
 	  double sinth = svtx.p4().Vect().Unit().Cross(tagInfoSV.flightDirection(0).unit()).Mag2();
@@ -716,7 +758,9 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	  TrackRefVector selTracks=tagInfoIP.selectedTracks();
 
 	  GlobalPoint pv(tagInfoIP.primaryVertex()->position().x(),tagInfoIP.primaryVertex()->position().y(),tagInfoIP.primaryVertex()->position().z());
-	  
+
+  	  reco::TrackKinematics allKinematics;	 
+ 
 	  for(int it=0;it<jets_.nselIPtrk[jets_.nref] ;it++)
 	    {
 	      jets_.ipJetIndex[jets_.nIP + it]= jets_.nref;
@@ -737,7 +781,26 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	      jets_.ip3dSig[jets_.nIP + it] = data.ip3d.significance();
 	      jets_.ipDist2Jet[jets_.nIP + it] = data.distanceToJetAxis.value();
 	      jets_.ipClosest2Jet[jets_.nIP + it] = (data.closestToJetAxis - pv).mag();  //decay length
+	    
+
+	      //additional info for charm tagger dev
+	      math::XYZVector trackMom = selTracks[it]->momentum();
+	      jets_.trackPtRel[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom,jetDir);
+	      jets_.trackPPar[jets_.nIP + it] = jetDir.Dot(trackMom);
+	      jets_.trackDeltaR[jets_.nIP + it] = ROOT::Math::VectorUtil::DeltaR(trackMom,jetDir); 
+	      jets_.trackPtRatio[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom, jetDir)/ std::sqrt(trackMom.Mag2());
+	      jets_.trackPParRatio[jets_.nIP + it] = jetDir.Dot(trackMom)/ std::sqrt(trackMom.Mag2());
+	      const Track track = *(selTracks[it]);
+	      allKinematics.add(track);
 	    }
+
+	  jets_.trackSumJetDeltaR[jets_.nref] = ROOT::Math::VectorUtil::DeltaR(allKinematics.vectorSum(),jetDir);
+
+          //do some sorting to get the impact parameter of all tracks in descending order
+	  jets_.trackSip2dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 1);
+	  jets_.trackSip3dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 2);
+	  jets_.trackSip2dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 3);
+	  jets_.trackSip3dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 4);
 
 	  jets_.nIP += jets_.nselIPtrk[jets_.nref];
 
@@ -1684,5 +1747,46 @@ void HiInclusiveJetAnalyzer::analyzeGenSubjets(const reco::GenJet jet) {
   jets_.genSubJetM.push_back(sjm);
   jets_.genSubJetArea.push_back(sjarea);
 }
+
+//--------------------------------------------------------------------------------------------------
+float HiInclusiveJetAnalyzer::getAboveCharmThresh(TrackRefVector& selTracks, const TrackIPTagInfo& ipData, int sigOrVal)
+{
+
+	const double pdgCharmMass = 1.290;
+	btag::SortCriteria sc;
+	switch(sigOrVal){
+		case 1: //2d significance 
+			sc = reco::btag::IP2DSig;
+		case 2: //3d significance
+			sc = reco::btag::IP3DSig;
+		case 3:
+			sc = reco::btag::IP2DSig;  //values are not sortable!
+		case 4:
+			sc = reco::btag::IP3DSig;
+	}
+	std::vector<std::size_t> indices = ipData.sortedIndexes(sc);
+	reco::TrackKinematics kin;
+	for(unsigned int i=0; i<indices.size(); i++){
+		size_t idx = indices[i];
+		const Track track = *(selTracks[idx]);
+		const btag::TrackIPData &data = ipData.impactParameterData()[idx];
+		kin.add(track);
+		if(kin.vectorSum().M() > pdgCharmMass){
+			switch(sigOrVal){
+				case 1:
+					return data.ip2d.significance();
+				case 2:
+					return data.ip3d.significance();
+				case 3:
+					return data.ip2d.value();
+				case 4:
+					return data.ip3d.value();
+			}
+		}
+	}
+	return 0;
+
+}
+
 
 DEFINE_FWK_MODULE(HiInclusiveJetAnalyzer);

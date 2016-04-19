@@ -172,6 +172,12 @@ HiEvtAnalyzer::~HiEvtAnalyzer()
 void
 HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
+  //cleanup previous event
+  npus.clear();
+  tnpus.clear();
+  ttbar_w.clear();
+  
   using namespace edm;
 
   // Run info
@@ -238,7 +244,7 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       //alternative weights for systematics
       edm::Handle<LHEEventProduct> evet;
       iEvent.getByToken(generatorlheToken_, evet);
-      if(evet.isValid())
+      if(evet.isValid() && genInfo.isValid())
         {
           double asdd=evet->originalXWGTUP();
           for(unsigned int i=0  ; i<evet->weights().size();i++){

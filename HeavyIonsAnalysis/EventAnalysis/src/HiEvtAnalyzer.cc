@@ -58,7 +58,8 @@ private:
 
   edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfoToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genInfoToken_;
-
+  edm::EDGetTokenT<LHEEventProduct> generatorlheToken_;
+  
   bool doEvtPlane_;
   bool doEvtPlaneFlat_;
   bool doCentrality_;
@@ -106,6 +107,9 @@ private:
   std::pair<int, int> pdfID;
   std::pair<float, float> pdfX;
   std::pair<float, float> pdfXpdf;
+
+  std::vector<float> ttbar_w; //weights for systematics
+  
   std::vector<int> npus;    //number of pileup interactions
   std::vector<float> tnpus; //true number of interactions
 
@@ -137,6 +141,7 @@ HiEvtAnalyzer::HiEvtAnalyzer(const edm::ParameterSet& iConfig) :
   VertexTag_(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("Vertex"))),
   puInfoToken_(consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("addPileupInfo"))),
   genInfoToken_(consumes<GenEventInfoProduct>(edm::InputTag("generator"))),
+  generatorlheToken_(consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
   doEvtPlane_(iConfig.getParameter<bool> ("doEvtPlane")),
   doEvtPlaneFlat_(iConfig.getParameter<bool> ("doEvtPlaneFlat")),
   doCentrality_(iConfig.getParameter<bool> ("doCentrality")),
@@ -228,6 +233,18 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           pdfXpdf.second = genInfo->pdf()->xPDF.second;
         }
       }
+
+      //alternative weights for systematics
+      edm::Handle<LHEEventProduct> evet;
+      iEvent.getByToken(generatorlheToken_, evet);
+      if(evet.isValid())
+        {
+          double asdd=evet->originalXWGTUP();
+          for(unsigned int i=0  ; i<evet->weights().size();i++){
+            double asdde=evet->weights()[i].wgt;
+            ttbar_w.push_back(genInfo->weight()*asdde/asdd);
+          }
+        }
     }
 
     // MC PILEUP INFORMATION
@@ -390,6 +407,7 @@ HiEvtAnalyzer::beginJob()
     thi_->Branch("pdfID",&pdfID);
     thi_->Branch("pdfX",&pdfX);
     thi_->Branch("pdfXpdf",&pdfXpdf);
+    thi_->Branch("ttbar_w",&ttbar_w);
     thi_->Branch("npus",&npus);
     thi_->Branch("tnpus",&tnpus);
   }

@@ -684,7 +684,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	if ( jets_.nsvtx[jets_.nref] > 0) {
 
 	  jets_.svtxntrk[jets_.nref]  = tagInfoSV.nVertexTracks(0);
-	  jets_.svJetDeltaR[jets_.nref] = reco::deltaR(tagInfoSV.flightDirection(0),jetDir);
+	  if(doExtraCTagging_) jets_.svJetDeltaR[jets_.nref] = reco::deltaR(tagInfoSV.flightDirection(0),jetDir);
 
 	  // this is the 3d flight distance, for 2-D use (0,true)
 	  Measurement1D m1D = tagInfoSV.flightDistance(0);
@@ -700,26 +700,28 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	  jets_.svtxm[jets_.nref]    = svtxM; 
 	  jets_.svtxpt[jets_.nref]   = svtxPt;
 	 
-	  double trkSumChi2=0;
-          int trkNetCharge=0;
-          int nTrkInCone=0;
-          int nsvtxtrks=0;
-          TrackRefVector svtxTracks = tagInfoSV.vertexTracks(0);
-          for(unsigned int itrk=0; itrk<svtxTracks.size(); itrk++){
-              nsvtxtrks++;
-              trkSumChi2 += svtxTracks.at(itrk)->chi2();
-              trkNetCharge += svtxTracks.at(itrk)->charge();
-              if(reco::deltaR(svtxTracks.at(itrk)->momentum(),jetDir)<rParam) nTrkInCone++;
-          }
-          jets_.svtxTrkSumChi2[jets_.nref] = trkSumChi2;
-          jets_.svtxTrkNetCharge[jets_.nref] = trkNetCharge;
-          jets_.svtxNtrkInCone[jets_.nref] = nTrkInCone;
- 
-	  //try out the corrected mass (http://arxiv.org/pdf/1504.07670v1.pdf)
-	  //mCorr=srqt(m^2+p^2sin^2(th)) + p*sin(th)
-	  double sinth = svtx.p4().Vect().Unit().Cross(tagInfoSV.flightDirection(0).unit()).Mag2();
-	  sinth = sqrt(sinth);
-	  jets_.svtxmcorr[jets_.nref] = sqrt(pow(svtxM,2)+(pow(svtxPt,2)*pow(sinth,2)))+svtxPt*sinth;
+	  if(doExtraCTagging_){
+		  double trkSumChi2=0;
+		  int trkNetCharge=0;
+		  int nTrkInCone=0;
+		  int nsvtxtrks=0;
+		  TrackRefVector svtxTracks = tagInfoSV.vertexTracks(0);
+		  for(unsigned int itrk=0; itrk<svtxTracks.size(); itrk++){
+			  nsvtxtrks++;
+			  trkSumChi2 += svtxTracks.at(itrk)->chi2();
+			  trkNetCharge += svtxTracks.at(itrk)->charge();
+			  if(reco::deltaR(svtxTracks.at(itrk)->momentum(),jetDir)<rParam) nTrkInCone++;
+		  }
+		  jets_.svtxTrkSumChi2[jets_.nref] = trkSumChi2;
+		  jets_.svtxTrkNetCharge[jets_.nref] = trkNetCharge;
+		  jets_.svtxNtrkInCone[jets_.nref] = nTrkInCone;
+
+		  //try out the corrected mass (http://arxiv.org/pdf/1504.07670v1.pdf)
+		  //mCorr=srqt(m^2+p^2sin^2(th)) + p*sin(th)
+		  double sinth = svtx.p4().Vect().Unit().Cross(tagInfoSV.flightDirection(0).unit()).Mag2();
+		  sinth = sqrt(sinth);
+		  jets_.svtxmcorr[jets_.nref] = sqrt(pow(svtxM,2)+(pow(svtxPt,2)*pow(sinth,2)))+svtxPt*sinth;
+	  }	
 
 	  if(svtx.ndof()>0)jets_.svtxnormchi2[jets_.nref]  = svtx.chi2()/svtx.ndof();
 	}
@@ -782,26 +784,28 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	      jets_.ipDist2Jet[jets_.nIP + it] = data.distanceToJetAxis.value();
 	      jets_.ipClosest2Jet[jets_.nIP + it] = (data.closestToJetAxis - pv).mag();  //decay length
 	    
-
 	      //additional info for charm tagger dev
-	      math::XYZVector trackMom = selTracks[it]->momentum();
-	      jets_.trackPtRel[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom,jetDir);
-	      jets_.trackPPar[jets_.nIP + it] = jetDir.Dot(trackMom);
-	      jets_.trackDeltaR[jets_.nIP + it] = ROOT::Math::VectorUtil::DeltaR(trackMom,jetDir); 
-	      jets_.trackPtRatio[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom, jetDir)/ std::sqrt(trackMom.Mag2());
-	      jets_.trackPParRatio[jets_.nIP + it] = jetDir.Dot(trackMom)/ std::sqrt(trackMom.Mag2());
-	      const Track track = *(selTracks[it]);
-	      allKinematics.add(track);
+	      if(doExtraCTagging_){
+		      math::XYZVector trackMom = selTracks[it]->momentum();
+		      jets_.trackPtRel[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom,jetDir);
+		      jets_.trackPPar[jets_.nIP + it] = jetDir.Dot(trackMom);
+		      jets_.trackDeltaR[jets_.nIP + it] = ROOT::Math::VectorUtil::DeltaR(trackMom,jetDir); 
+		      jets_.trackPtRatio[jets_.nIP + it] = ROOT::Math::VectorUtil::Perp(trackMom, jetDir)/ std::sqrt(trackMom.Mag2());
+		      jets_.trackPParRatio[jets_.nIP + it] = jetDir.Dot(trackMom)/ std::sqrt(trackMom.Mag2());
+		      const Track track = *(selTracks[it]);
+		      allKinematics.add(track);
+	      }
 	    }
 
-	  jets_.trackSumJetDeltaR[jets_.nref] = ROOT::Math::VectorUtil::DeltaR(allKinematics.vectorSum(),jetDir);
+	  if(doExtraCTagging_){
+		  jets_.trackSumJetDeltaR[jets_.nref] = ROOT::Math::VectorUtil::DeltaR(allKinematics.vectorSum(),jetDir);
 
-          //do some sorting to get the impact parameter of all tracks in descending order
-	  jets_.trackSip2dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 1);
-	  jets_.trackSip3dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 2);
-	  jets_.trackSip2dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 3);
-	  jets_.trackSip3dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 4);
-
+		  //do some sorting to get the impact parameter of all tracks in descending order
+		  jets_.trackSip2dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 1);
+		  jets_.trackSip3dSigAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 2);
+		  jets_.trackSip2dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 3);
+		  jets_.trackSip3dValAboveCharm[jets_.nref] = getAboveCharmThresh(selTracks, tagInfoIP, 4);
+	  }
 	  jets_.nIP += jets_.nselIPtrk[jets_.nref];
 
 	}

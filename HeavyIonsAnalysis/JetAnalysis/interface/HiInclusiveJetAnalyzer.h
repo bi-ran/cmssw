@@ -32,7 +32,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "fastjet/contrib/Njettiness.hh"
-
+#include "TMVA/Reader.h"
 //
 
 /**\class HiInclusiveJetAnalyzer
@@ -122,6 +122,10 @@ private:
 
   std::vector<float> usedStringPts;
 
+  //for the JetID BDT
+  std::unique_ptr<TMVA::Reader> reader;
+  std::unique_ptr<float[]> varAddr;
+
   /// verbose ?
   bool verbose_;
   bool doMatch_;
@@ -167,6 +171,7 @@ private:
   std::vector<bool>             hltTrgDeci_;         //HLT trigger descision(s)
   std::vector<std::string>      hltTrgUsedNames_;    //HLT used trigger name(s)
   std::string                   hltUsedResName_;     //used HLT trigger results name
+  std::string			jetIDweightFile_;
 
   std::string bTagJetName_;
   edm::EDGetTokenT<std::vector<reco::TrackIPTagInfo> > ImpactParameterTagInfos_;
@@ -393,6 +398,8 @@ private:
     int muchg[MAXJETS];
 
     float discr_fr01[MAXJETS];
+    float discr_jetID_cuts[MAXJETS];
+    float discr_jetID_bdt[MAXJETS];
 
     float refpt[MAXJETS];
     float refeta[MAXJETS];

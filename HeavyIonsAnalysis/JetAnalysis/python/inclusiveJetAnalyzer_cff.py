@@ -22,7 +22,8 @@ inclusiveJetAnalyzer = cms.EDAnalyzer("HiInclusiveJetAnalyzer",
                                       doHiJetID = cms.untracked.bool(True),
                                       doStandardJetID = cms.untracked.bool(False),
                                       doSubEvent = cms.untracked.bool(False),
-                                      
+	                              jetIDWeight = cms.untracked.string("HeavyIonsAnalysis/JetAnalysis/data/JetID_TMVAClassification_BDTG_weights.xml"),       
+ 					
                                       hltTrgResults = cms.untracked.string("TriggerResults::HLT"),
                                       hltTrgNames  = cms.untracked.vstring('HLT_HIMinBiasHfOrBSC_Core',
                                                                            'HLT_HIJet35U',

@@ -91,6 +91,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
 
   doTrigger_ = iConfig.getUntrackedParameter<bool>("doTrigger",false);
   doHiJetID_ = iConfig.getUntrackedParameter<bool>("doHiJetID",false);
+  if(doHiJetID_) jetIDweightFile_ = iConfig.getUntrackedParameter<string>("jetIDWeight","weights.xml");
   doStandardJetID_ = iConfig.getUntrackedParameter<bool>("doStandardJetID",false);
 
   rParam = iConfig.getParameter<double>("rParam");
@@ -180,6 +181,16 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   fastjet::contrib::NormalizedMeasure normalizedMeasure(1.,rParam);
   routine_ = std::auto_ptr<fastjet::contrib::Njettiness> ( new fastjet::contrib::Njettiness( onepass_kt_axes, normalizedMeasure) );
 
+  if(doHiJetID_){
+	  string inputArrs[] = { "trackMax/jtpt", "trackHardSum/jtpt", "trackHardN/jtpt", "chargedN/jtpt", "chargedHardSum/jtpt", "chargedHardN/jtpt", "photonN/jtpt", "photonHardSum/jtpt", "photonHardN/jtpt", "neutralN/jtpt", "hcalSum/jtpt", "ecalSum/jtpt", "chargedMax/jtpt", "chargedSum/jtpt", "neutralMax/jtpt", "neutralSum/jtpt", "photonMax/jtpt", "photonSum/jtpt", "eSum/jtpt", "muSum/jtpt" };
+	  varAddr = std::unique_ptr<float[]> (new float[sizeof(inputArrs)/sizeof(inputArrs[0])]);
+
+	  reader = std::unique_ptr<TMVA::Reader> (new TMVA::Reader("V:Color:!Silent"));
+	  for(unsigned int ivar=0; ivar< (sizeof(inputArrs)/sizeof(inputArrs[0])); ivar++){ reader->AddVariable(inputArrs[ivar].c_str(), &(varAddr.get()[ivar])); }
+	  edm::FileInPath fp(jetIDweightFile_.data());
+	  std::string transFileName = fp.fullPath(); 
+	  reader->BookMVA("BDTG",transFileName.c_str());
+   }
 }
 
 
@@ -245,6 +256,9 @@ HiInclusiveJetAnalyzer::beginJob() {
   
   // jet ID information, jet composition
   if(doHiJetID_){
+    t->Branch("discr_jetID_cuts", jets_.discr_jetID_cuts,"discr_jetID_cuts[nref]/F");
+    t->Branch("discr_jetID_bdt", jets_.discr_jetID_bdt,"discr_jetID_bdt[nref]/F");
+
     t->Branch("discr_fr01", jets_.discr_fr01,"discr_fr01[nref]/F");
 
     t->Branch("trackMax", jets_.trackMax,"trackMax[nref]/F");
@@ -511,7 +525,6 @@ HiInclusiveJetAnalyzer::beginJob() {
   */
   TH1D::SetDefaultSumw2();
 
-
 }
 
 
@@ -657,7 +670,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
   // FILL JRA TREE
   jets_.b = b;
   jets_.nref = 0;
-
 
   if(doTrigger_){
     fillL1Bits(iEvent);
@@ -1026,6 +1038,23 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
     if(doHiJetID_){
 
+      // JetID Selections for 5 TeV PbPb
+      // Cuts by Yen-Jie Lee, BDT by Kurt Jung
+      double rawpt = jets_.rawpt[jets_.nref];
+      float jtpt = jet.pt();
+      int ijet = jets_.nref;
+      jets_.discr_jetID_cuts[jets_.nref] = jets_.neutralMax[ijet]/rawpt*0.085 + 
+					   jets_.photonMax[ijet]/rawpt*0.337 + 
+					   jets_.chargedMax[ijet]/rawpt*0.584 + 
+					   jets_.neutralSum[ijet]/rawpt*-0.454 + 
+					   jets_.photonSum[ijet]/rawpt*-0.127 + 
+					   jets_.chargedSum[ijet]/rawpt*(-0.239) + 
+					   jets_.jtpu[ijet]/rawpt*(-0.184) + 0.173;
+      //begin bdt - TMVA requires you to load in all input vars and names into separate containers (eyeroll)
+      float tempVarAddr[] = {jets_.trackMax[ijet]/jtpt, jets_.trackHardSum[ijet]/jtpt, jets_.trackHardN[ijet]/jtpt, jets_.chargedN[ijet]/jtpt, jets_.chargedHardSum[ijet]/jtpt, jets_.chargedHardN[ijet]/jtpt, jets_.photonN[ijet]/jtpt, jets_.photonHardSum[ijet]/jtpt, jets_.photonHardN[ijet]/jtpt, jets_.neutralN[ijet]/jtpt, jets_.hcalSum[ijet]/jtpt, jets_.ecalSum[ijet]/jtpt, jets_.chargedMax[ijet]/jtpt, jets_.chargedSum[ijet], jets_.neutralMax[ijet]/jtpt, jets_.neutralSum[ijet]/jtpt, jets_.photonMax[ijet]/jtpt, jets_.photonSum[ijet]/jtpt, jets_.eSum[ijet]/jtpt, jets_.muSum[ijet]/jtpt};
+      for(unsigned int ivar=0; ivar<(sizeof(tempVarAddr)/sizeof(tempVarAddr[0])); ivar++){ varAddr[ivar] = tempVarAddr[ivar]; }
+      jets_.discr_jetID_bdt[jets_.nref] = reader->EvaluateMVA("BDTG");
+
       /////////////////////////////////////////////////////////////////
       // Jet core pt^2 discriminant for fake jets
       // Edited by Yue Shi Lai <ylai@mit.edu>
@@ -1373,6 +1402,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
     }
 
   }
+
 
   t->Fill();
   memset(&jets_,0,sizeof jets_);

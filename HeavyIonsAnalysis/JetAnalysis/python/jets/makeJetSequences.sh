@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for system in PbPb pp
+for system in PbPb pp pPb
 do
     for sample in data jec mc mb
     do
@@ -18,7 +18,11 @@ do
                         for object in PF Calo
                         do
 			    # no Cs Calo or pp jets
-			    if ( [ $object == "Calo" ] || [ $system == "pp" ] ) && ( [ $sub == "Cs" ] ) ; then
+			    
+                            if( [ $system == "pPb" ] ) && ( [ $radius -ne 4 ] || [ $sample != "jec" ] || [ $sub != "NONE" ] || [ $groom != "NONE" ] ) ; then 
+                                continue
+                            fi
+                            if ( [ $object == "Calo" ] || [ $system == "pp" ] ) && ( [ $sub == "Cs" ] ) ; then
 			        continue
 			    fi
                             subt=$sub
@@ -57,7 +61,7 @@ do
 			    jetcorrectionlevels="\'L2Relative\',\'L3Absolute\'"
                             #echo "" > $algo$subt$radius${object}JetSequence_${system}_${sample}_cff.py
                             
-                            if [ $system == "pp" ]; then
+                            if [ $system == "pp" ] || [ $system == "pPb" ]; then
                                 #corrlabel="_generalTracks"
                                 tracks="generalTracks"
 			        vertex="offlinePrimaryVertices"
@@ -74,11 +78,13 @@ do
                                 ismc="True"
                             fi
 
-                            if [ $system == "pp" ]; then
+                            if [ $system == "pp" ] || [ $system == "pPb" ]; then
                                 genjets="GenJets"
                                 matchGenjets="GenJets"
                             fi
-
+                            if [ $system == "pPb" ]; then 
+                                corrlabel=""
+                            fi
 			    if [ $sub == "Pu" ]; then
 			        corrname=`echo ${algo} | sed 's/\(.*\)/\U\1/'`${sub}${radius}${object}${corrlabel}
 			    else 

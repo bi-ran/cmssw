@@ -27,7 +27,7 @@ process.HiForest.HiForestVersion = cms.string(version)
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(
-                                "file:step3_MinBias_pPb_RAW2DIGI_L1Reco_RECO_1.root"
+				"root://cms-xrd-global.cern.ch//store/himc/pPb816Summer16DR/ReggeGribovPartonMC_EposLHC_pPb_4080_4080/AODSIM/80X_mcRun2_asymptotic_v15-v1/100000/003E9BF0-7979-E611-B43E-000E1EB004E0.root"
                             )
 )
 
@@ -146,6 +146,16 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 #####################################################################################
+#####################
+# Rechit analyzer
+#####################
+process.load('HeavyIonsAnalysis.JetAnalysis.rechitanalyzer_pp_cfi')
+process.rechitanalyzer.doVS = cms.untracked.bool(False)
+process.rechitanalyzer.doEcal = cms.untracked.bool(False)
+process.rechitanalyzer.doHcal = cms.untracked.bool(False)
+process.rechitanalyzer.doHF = cms.untracked.bool(False)
+process.rechitanalyzer.JetSrc = cms.untracked.InputTag("ak4CaloJets")
+process.pfTowers.JetSrc = cms.untracked.InputTag("ak4CaloJets")
 
 #########################
 # Main analysis list
@@ -160,7 +170,8 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.pfcandAnalyzer +
                             process.HiForest +
 			    process.trackSequencesPP +
-                            process.runAnalyzer
+                            process.runAnalyzer +
+                            process.rechitanalyzer
 )
 
 #####################################################################################

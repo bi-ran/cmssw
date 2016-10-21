@@ -68,7 +68,6 @@ do
                                 genparticles="genParticles"
                                 partons="genParticles"
                                 pflow="particleFlow"
-			        doTower="False"
 			        if [ $sample == "data" ] && [ $sub == "NONE" ] && [ $radius == 4 ] && [ $object == "PF" ]; then
 				    jetcorrectionlevels="\'L2Relative\',\'L3Absolute\',\'L2L3Residual\'"
 			        fi
@@ -81,6 +80,9 @@ do
                             if [ $system == "pp" ] || [ $system == "pPb" ]; then
                                 genjets="GenJets"
                                 matchGenjets="GenJets"
+                            fi
+                            if [ $system == "pp" ]; then
+                                doTower="False"
                             fi
                             if [ $system == "pPb" ]; then 
                                 corrlabel=""

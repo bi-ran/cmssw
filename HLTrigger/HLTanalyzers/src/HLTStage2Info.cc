@@ -13,10 +13,8 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 
 // L1 related
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-#include "L1Trigger/L1TGlobal/interface/L1TGlobalUtil.h"
-#include "DataFormats/L1TGlobal/interface/GlobalObjectMap.h"
-#include "DataFormats/L1TGlobal/interface/GlobalObjectMapRecord.h"
+#include "CondFormats/L1TObjects/interface/L1TUtmTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1TUtmTriggerMenuRcd.h"
 
 HLTStage2Info::HLTStage2Info() {
 
@@ -28,7 +26,7 @@ void HLTStage2Info::beginRun(const edm::Run& run, const edm::EventSetup& c){
 
 
   bool changed(true);
-  if (hltPrescaleProvider_->init(run,c,processName_,changed)) {
+  if (hltConfigProvider_->init(run,c,processName_,changed)) {
     // if init returns TRUE, initialisation has succeeded!
     if (changed) {
       // The HLT config has actually changed wrt the previous Run, hence rebook your
@@ -41,6 +39,8 @@ void HLTStage2Info::beginRun(const edm::Run& run, const edm::EventSetup& c){
     std::cout << " HLT config extraction failure with process name " << processName_ << std::endl;
     // In this case, all access methods will return empty values!
   }
+  l1tGlobalUtil_->setUnprescaledUnmasked(!getPrescales_, true);
+  l1tGlobalUtil_->retrieveL1Setup(c);
 
 }
 
@@ -57,6 +57,7 @@ void HLTStage2Info::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     if ( (*iParam) == "Debug" ) _Debug =  myHltParams.getParameter<bool>( *iParam );
   }
 
+  getPrescales_ = pSet.getUntrackedParameter<bool>("getPrescales", false);
   dummyBranches_ = pSet.getUntrackedParameter<std::vector<std::string> >("dummyBranches",std::vector<std::string>(0));
 
   HltEvtCnt = 0;
@@ -177,6 +178,7 @@ void HLTStage2Info::analyze(const edm::Handle<edm::TriggerResults>              
   
   //   std::cout << " Beginning HLTStage2Info " << std::endl;
 
+  l1tGlobalUtil_->retrieveL1Event(iEvent,eventSetup);
 
   /////////// Analyzing HLT Trigger Results (TriggerResults) //////////
   if (hltresults.isValid()) {
@@ -219,7 +221,7 @@ void HLTStage2Info::analyze(const edm::Handle<edm::TriggerResults>              
       std::string trigName=triggerNames.triggerName(itrig);
       bool accept = hltresults->accept(itrig);
 
-      trigPrescl[itrig] = hltPrescaleProvider_->prescaleValue(iEvent, eventSetup, trigName);
+      trigPrescl[itrig] = hltConfigProvider_->prescaleValue(l1tGlobalUtil_->prescaleColumn(), trigName);
 
 
       if (accept){trigflag[itrig] = 1;}
@@ -369,14 +371,11 @@ void HLTStage2Info::analyze(const edm::Handle<edm::TriggerResults>              
 
   //==============L1 Stage2 information=======================================
 
-  const int set(hltPrescaleProvider_->prescaleSet(iEvent, eventSetup));
-  if (set<0) std::cout << "%Could not extract Prescale set index from event record" << std::endl;
-  l1t::L1TGlobalUtil const& l1tGlbUtil = hltPrescaleProvider_->l1tGlobalUtil();
 
   if (L1GOMR.isValid()) {
     // Get the stage2 menu from GlobalObjectMapRecord collection
-    const std::vector<GlobalObjectMap> gObjectMapRecord = L1GOMR->gtObjectMap();
     if (L1TEvtCnt==0){
+      const std::vector<GlobalObjectMap> gObjectMapRecord = L1GOMR->gtObjectMap();
       // 1st event : Book as many branches as trigger paths provided in the input...
       std::vector<GlobalObjectMap>::const_iterator gObjectMap = gObjectMapRecord.begin();
       for (; gObjectMap!=gObjectMapRecord.end(); ++gObjectMap) {
@@ -392,12 +391,37 @@ void HLTStage2Info::analyze(const edm::Handle<edm::TriggerResults>              
       std::string name = iL1Trig->second.Data();
       int iBit = iL1Trig->first;
       l1TFinalFlag[iBit] = L1GOMR->getObjectMap(name)->algoGtlResult();
-      if(!l1tGlbUtil.getPrescaleByName(name, l1TPrescl[iBit])) l1TPrescl[iBit] = -9;
+      if(!(l1tGlobalUtil_->getPrescaleByName(name, l1TPrescl[iBit]))) l1TPrescl[iBit] = -1;
     }
     L1TEvtCnt++;
   }
   else {
-    if (_Debug) std::cout << "%HLTStage2Info -- No L1 Stage2 Global Object Map Record " << std::endl;
+    // Get the stage2 menu from Event Setup
+    if (L1TEvtCnt==0){
+      edm::ESTransientHandle<L1TUtmTriggerMenu> l1GtMenu;
+      eventSetup.get< L1TUtmTriggerMenuRcd>().get(l1GtMenu);
+      if(l1GtMenu.isValid()) {
+        const L1TUtmTriggerMenu* stage2Menu = l1GtMenu.product();
+        // Book branches for algo bits
+        for (auto const & algo: stage2Menu->getAlgorithmMap()) {
+          int itrig = algo.second.getIndex();
+          algoBitToName[itrig] = TString( algo.second.getName() );
+          HltTree->Branch(algoBitToName[itrig],l1TFinalFlag+itrig,algoBitToName[itrig]+"/I");
+          HltTree->Branch(algoBitToName[itrig]+"_Prescl",l1TPrescl+itrig,algoBitToName[itrig]+"_Prescl/I");
+        }
+      }
+    }
+    // ...Fill the corresponding accepts in branch-variables
+    std::map< int, TString >::iterator iL1Trig = algoBitToName.begin();
+    for (; iL1Trig!=algoBitToName.end(); ++iL1Trig) {
+      std::string name = iL1Trig->second.Data();
+      int iBit = iL1Trig->first;
+      bool des = false;
+      if (!(l1tGlobalUtil_->getFinalDecisionByName(name, des))) l1TFinalFlag[iBit] = false;
+      else l1TFinalFlag[iBit] = des;
+      if(!(l1tGlobalUtil_->getPrescaleByName(name, l1TPrescl[iBit]))) l1TPrescl[iBit] = -1;
+    }
+    L1TEvtCnt++;
   }
 
   if (_Debug) std::cout << "%HLTStage2Info -- Done with routine" << std::endl;

@@ -27,8 +27,10 @@
 //ccla
 #include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Common/interface/Provenance.h"
+#include "FWCore/Framework/interface/ESTransientHandle.h"
 
-#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "L1Trigger/L1TGlobal/interface/L1TGlobalUtil.h"
 
 namespace edm {
   class ConsumesCollector;
@@ -93,8 +95,10 @@ private:
 
   std::map<int,TString> algoBitToName;
   std::vector<std::string> dummyBranches_;
+  bool getPrescales_;
 
-  std::unique_ptr<HLTPrescaleProvider> hltPrescaleProvider_;
+  std::unique_ptr<HLTConfigProvider>  hltConfigProvider_;
+  std::unique_ptr<l1t::L1TGlobalUtil> l1tGlobalUtil_;
   std::string processName_;
 
   // input variables
@@ -113,7 +117,8 @@ HLTStage2Info::HLTStage2Info(edm::ParameterSet const& pset,
                  edm::ConsumesCollector& iC,
                  T& module) :
     HLTStage2Info() {
-    hltPrescaleProvider_.reset(new HLTPrescaleProvider(pset, iC, module));
+      hltConfigProvider_.reset(new HLTConfigProvider());
+      l1tGlobalUtil_.reset(new l1t::L1TGlobalUtil(pset, iC, module));
 }
 
 #endif

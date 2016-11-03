@@ -100,5 +100,6 @@ private:
   TFile* m_file; // pointer to Histogram file
   bool _UseTFileService;
   bool _UseL1Stage2;
+  bool _getL1InfoFromEventSetup;
 
 };

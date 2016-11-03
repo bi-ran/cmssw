@@ -10,6 +10,7 @@ hltbitanalysis = cms.EDAnalyzer("HLTBitAnalyzer",
 
     ### L1 Stage 2 objects
     l1tAlgBlkInputTag               = cms.InputTag("gtStage2Digis"),  # Needed, fix bug of GlobalAlgBlk uninitialized token
+    l1tExtBlkInputTag               = cms.InputTag("gtStage2Digis"),
     gObjectMapRecord                = cms.InputTag("hltGtStage2ObjectMap"),
     gmtStage2Digis                  = cms.string("gmtStage2Digis"),
     caloStage2Digis                 = cms.string("caloStage2Digis"),

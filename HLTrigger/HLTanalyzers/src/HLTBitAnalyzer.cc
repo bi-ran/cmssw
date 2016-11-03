@@ -35,6 +35,7 @@ HLTBitAnalyzer::HLTBitAnalyzer(edm::ParameterSet const& conf)  :
   // variables. Example as follows:
 
   _UseL1Stage2 = conf.getUntrackedParameter<bool>("UseL1Stage2",true);
+  _getL1InfoFromEventSetup = conf.getUntrackedParameter<bool>("getL1InfoFromEventSetup", true);
 
   if (_UseL1Stage2) {
     std::cout << " Starting Stage2 HLTBitAnalyzer Analysis " << std::endl;
@@ -154,7 +155,7 @@ void HLTBitAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iS
 
   getCollection( iEvent, missing, hltresults,      hltresults_,        hltresultsToken_,      kHltresults );
   if (_UseL1Stage2) {
-    getCollection( iEvent, missing, l1GoMR,          gObjectMapRecord_,  gObjectMapRecordToken_,"L1 Stage2 Global Object Map Record" );
+    if(!_getL1InfoFromEventSetup) getCollection( iEvent, missing, l1GoMR,          gObjectMapRecord_,  gObjectMapRecordToken_,"L1 Stage2 Global Object Map Record" );
     getCollection( iEvent, missing, l1stage2eg,      m_l1stage2eg,       l1stage2egToken_,      "L1 Stage2 EGamma objects" );
     getCollection( iEvent, missing, l1stage2mu,      m_l1stage2mu,       l1stage2muToken_,      "L1 Stage2 Muon objects" );
     getCollection( iEvent, missing, l1stage2jet,     m_l1stage2jet,      l1stage2jetToken_,     "L1 Stage2 Jet objects" );

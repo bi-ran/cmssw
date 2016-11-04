@@ -1,9 +1,21 @@
 import FWCore.ParameterSet.Config as cms
 
-from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pp_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import *
 
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pp_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pp_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akCs4PFJetSequence_pPb_jec_cff import *
+
+from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
+from RecoHI.HiJetAlgos.hiFJRhoProducer import hiFJRhoProducer
+from RecoHI.HiJetAlgos.hiFJGridEmptyAreaCalculator_cff import hiFJGridEmptyAreaCalculator
+kt4PFJets.src = cms.InputTag('particleFlow')
+kt4PFJets.doAreaFastjet = True
+kt4PFJets.jetPtMin      = cms.double(0.0)
+kt4PFJets.GhostArea     = cms.double(0.005)
+kt2PFJets = kt4PFJets.clone(rParam       = cms.double(0.2))
 
 ak4PFJetAnalyzer.doSubEvent = True
 ak4CaloJetAnalyzer.doSubEvent = True
@@ -24,13 +36,25 @@ highPurityTracks = cms.EDFilter("TrackSelector",
                                 cut = cms.string('quality("highPurity")')
 )
 
+#custom for 80X
+PFTowers.src = cms.InputTag("particleFlow")
+
 jetSequences = cms.Sequence(
     akGenJets +
 #    ppReRecoPFJets +
 #    ppReRecoCaloJets +
+    #kt2PFJets +
+    #kt4PFJets +
+    hiReRecoCaloJets +
+    PFTowers +
+    hiReRecoPFJets +
+    #hiFJRhoProducer +
+    #hiFJGridEmptyAreaCalculator +
     makePartons +
     highPurityTracks +
-    ak4CaloJets +
     ak4PFJetSequence +
-    ak4CaloJetSequence 
+    akPu4PFJetSequence +
+    ak4CaloJetSequence +
+    akPu4CaloJetSequence  
+    #akCs4PFJetSequence 
     )

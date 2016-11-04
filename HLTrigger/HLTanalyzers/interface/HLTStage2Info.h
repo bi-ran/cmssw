@@ -85,7 +85,8 @@ private:
   int   *l1stage2dimuchg, *l1stage2dimuidx1, *l1stage2dimuidx2;
   float *l1stage2jtet, *l1stage2jte, *l1stage2jteta, *l1stage2jtphi;
   float *l1stage2tauet, *l1stage2taue, *l1stage2taueta, *l1stage2tauphi;
-  int   *l1stage2etset, *l1stage2etsphi;
+  int   *l1stage2etshwet, *l1stage2etshwphi;
+  float *l1stage2etset, *l1stage2etsphi;
   int   *l1stage2ctetem, *l1stage2cteth, *l1stage2ctetc, *l1stage2cteta, *l1stage2ctphi;
   int   *l1stage2etstype;
   int   *l1stage2egbx, *l1stage2mubx, *l1stage2jtbx, *l1stage2taubx, *l1stage2etsbx, *l1stage2ctbx;

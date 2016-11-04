@@ -113,8 +113,10 @@ void HLTStage2Info::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   l1stage2tauphi = new float[kMaxL1Stage2Tau];
   l1stage2taubx = new int[kMaxL1Stage2Tau];
   const int kMaxL1Stage2EtS = 10000;
-  l1stage2etset = new int[kMaxL1Stage2EtS];
-  l1stage2etsphi = new int[kMaxL1Stage2EtS];
+  l1stage2etset = new float[kMaxL1Stage2EtS];
+  l1stage2etsphi = new float[kMaxL1Stage2EtS];
+  l1stage2etshwet = new int[kMaxL1Stage2EtS];
+  l1stage2etshwphi = new int[kMaxL1Stage2EtS];
   l1stage2etstype = new int[kMaxL1Stage2EtS];
   l1stage2etsbx = new int[kMaxL1Stage2EtS];
 
@@ -160,8 +162,10 @@ void HLTStage2Info::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   HltTree->Branch("L1Stage2TauPhi",l1stage2tauphi,"L1Stage2TauPhi[NL1Stage2Tau]/F");
   HltTree->Branch("L1Stage2TauBx",l1stage2taubx,"L1Stage2TauBx[NL1Stage2Tau]/I");
   HltTree->Branch("NL1Stage2EtSum",&nl1stage2ets,"NL1Stage2EtSum/I");
-  HltTree->Branch("L1Stage2EtSumEt",l1stage2etset,"L1Stage2EtSumEt[NL1Stage2EtSum]/I");
-  HltTree->Branch("L1Stage2EtSumPhi",l1stage2etsphi,"L1Stage2EtSumPhi[NL1Stage2EtSum]/I");
+  HltTree->Branch("L1Stage2EtSumEt",l1stage2etset,"L1Stage2EtSumEt[NL1Stage2EtSum]/F");
+  HltTree->Branch("L1Stage2EtSumPhi",l1stage2etsphi,"L1Stage2EtSumPhi[NL1Stage2EtSum]/F");
+  HltTree->Branch("L1Stage2EtSumHwEt",l1stage2etshwet,"L1Stage2EtSumHwEt[NL1Stage2EtSum]/I");
+  HltTree->Branch("L1Stage2EtSumHwPhi",l1stage2etshwphi,"L1Stage2EtSumHwPhi[NL1Stage2EtSum]/I");
   HltTree->Branch("L1Stage2EtSumType",l1stage2etstype,"L1Stage2EtSumType[NL1Stage2EtSum]/I");
   HltTree->Branch("L1Stage2EtSumBx",l1stage2etsbx,"L1Stage2EtSumBx[NL1Stage2EtSum]/I");
 }
@@ -357,8 +361,10 @@ void HLTStage2Info::analyze(const edm::Handle<edm::TriggerResults>              
     typedef std::vector<l1t::EtSum>::const_iterator l1cand;
     for(int iBx = L1Stage2EtSum->getFirstBX(); iBx <= L1Stage2EtSum->getLastBX(); ++iBx) { 
       for (l1cand etsItr=L1Stage2EtSum->begin(iBx); etsItr!=L1Stage2EtSum->end(iBx); ++etsItr) {
-        l1stage2etset[il1stage2ets]   = etsItr->hwPt();
-        l1stage2etsphi[il1stage2ets]  = etsItr->hwPhi();
+        l1stage2etset[il1stage2ets]   = etsItr->et();
+        l1stage2etsphi[il1stage2ets]  = etsItr->phi();
+        l1stage2etshwet[il1stage2ets]   = etsItr->hwPt();
+        l1stage2etshwphi[il1stage2ets]  = etsItr->hwPhi();
         l1stage2etstype[il1stage2ets] = etsItr->getType();
         l1stage2etsbx[il1stage2ets]   = iBx;
         il1stage2ets++;

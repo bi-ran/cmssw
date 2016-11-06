@@ -6,7 +6,7 @@ from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pp_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pp_jec_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.akCs4PFJetSequence_pPb_jec_cff import *
+#from HeavyIonsAnalysis.JetAnalysis.jets.akCs4PFJetSequence_pPb_jec_cff import *
 
 from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
 from RecoHI.HiJetAlgos.hiFJRhoProducer import hiFJRhoProducer

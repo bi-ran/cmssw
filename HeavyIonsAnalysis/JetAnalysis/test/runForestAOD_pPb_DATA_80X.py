@@ -82,9 +82,7 @@ process.TFileService = cms.Service("TFileService",
 # Jets
 #############################
 
-process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPPb")
-# Use this version for JEC
-#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPP")
+process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_DataPPb")
 
 #####################################################################################
 
@@ -110,17 +108,12 @@ process.hiEvtAnalyzer.doEvtPlane = cms.bool(False)
 process.hiEvtAnalyzer.doMC = cms.bool(True) #general MC info
 process.hiEvtAnalyzer.doHiMC = cms.bool(False) #HI specific MC info
 
-process.load('HeavyIonsAnalysis.JetAnalysis.HiGenAnalyzer_cfi')
-process.HiGenParticleAna.genParticleSrc = cms.untracked.InputTag("genParticles")
-process.HiGenParticleAna.doHI = False
 process.load('HeavyIonsAnalysis.EventAnalysis.runanalyzer_cff')
 process.load("HeavyIonsAnalysis.JetAnalysis.pfcandAnalyzer_pp_cfi")
-process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 process.pfcandAnalyzer.doVS = cms.untracked.bool(False)
 process.pfcandAnalyzer.doUEraw_ = cms.untracked.bool(False)
-process.pfcandAnalyzer.genLabel = cms.InputTag("genParticles")
 
 #####################################################################################
 
@@ -187,7 +180,6 @@ process.load('HeavyIonsAnalysis.JetAnalysis.hiFJRhoAnalyzer_cff')
 #####################
 process.load('HeavyIonsAnalysis.MuonAnalysis.hltMuTree_cfi')
 process.hltMuTree.vertices = cms.InputTag("offlinePrimaryVertices")
-process.hltMuTree.genparticle = cms.InputTag("genParticles")
 
 #########################
 # Main analysis list
@@ -196,7 +188,6 @@ process.ana_step = cms.Path(process.hltanalysis *
 			    process.hltobject *
                             process.centralityBin *
 			    process.hiEvtAnalyzer *
-                            process.HiGenParticleAna*
                             process.jetSequences +
                             process.egmGsfElectronIDSequence + #Should be added in the path for VID module
                             process.ggHiNtuplizer +

@@ -22,11 +22,11 @@ ak4CaloJetAnalyzer.doSubEvent = True
 
 from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
 ak5GenJets = ak5GenJets
-ak4GenJets = ak5GenJets.clone(rParam = 0.4)
+ak4GenJets = ak5GenJets.clone(rParam = 0.4, src = cms.InputTag("genParticlesForJetsNoNu"))
 from RecoJets.Configuration.GenJetParticles_cff import *
 
 akGenJets = cms.Sequence(
-    genParticlesForJets +
+    genParticlesForJetsNoNu +
     ak4GenJets
 )
 

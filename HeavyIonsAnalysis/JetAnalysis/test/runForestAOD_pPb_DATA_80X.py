@@ -62,7 +62,11 @@ process.GlobalTag.toGet.extend([
                  tag = cms.string("CentralityTable_HFtowersPlusTrunc200_EPOS5TeV_v80x01_mc"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("HFtowersPlusTruncEpos")
-             )
+             ),
+	cms.PSet(record = cms.string("L1TGlobalPrescalesVetosRcd"),
+                tag = cms.string("L1TGlobalPrescalesVetos_Stage2v0_hlt"),
+                connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+                )
 ])
 
 #####################################################################################

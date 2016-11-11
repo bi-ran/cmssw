@@ -48,7 +48,8 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
  
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_v20', '')
 process.HiForest.GlobalTagLabel = process.GlobalTag.globaltag
 
 
@@ -62,7 +63,11 @@ process.GlobalTag.toGet.extend([
                  tag = cms.string("CentralityTable_HFtowersPlusTrunc200_EPOS5TeV_v80x01_mc"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("HFtowersPlusTruncEpos")
-             )
+             ),
+	cms.PSet(record = cms.string("L1TGlobalPrescalesVetosRcd"),
+                tag = cms.string("L1TGlobalPrescalesVetos_Stage2v0_hlt"),
+                connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+                )
 ])
 
 #####################################################################################

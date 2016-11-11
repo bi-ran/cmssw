@@ -2,10 +2,10 @@ import FWCore.ParameterSet.Config as cms
 
 from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import *
 
-from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pp_data_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pp_data_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pp_data_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pp_data_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_data_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pPb_data_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_data_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pPb_data_cff import *
 
 ## put this back in if you need to rebuild the rho analyzer eta maps...
 #from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets

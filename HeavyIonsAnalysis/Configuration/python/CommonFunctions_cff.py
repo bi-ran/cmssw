@@ -778,13 +778,23 @@ def overrideJEC_pPb8TeV(process):
 	cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+                 label = cms.untracked.string("AKPu4Calo")
+             ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
+                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+                 label = cms.untracked.string("AKPu4PF")
+	     ),
+	cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
+                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AKPu4Calo_offline")
              ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AKPu4PF_offline")
-	     )
+             )
     ])
     return process
 

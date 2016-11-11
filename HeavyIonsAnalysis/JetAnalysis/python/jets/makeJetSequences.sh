@@ -19,7 +19,7 @@ do
                         do
 			    # no Cs Calo or pp jets
 			    
-                            if( [ $system == "pPb" ] ) && ( [ $radius -ne 4 ] || [ $sample != "jec" ] || [ $sub != "NONE" ] || [ $groom != "NONE" ] ) ; then 
+                            if ( [ $system == "pPb" ] ) && ( [ $radius -ne 4 ] || ( [ $sub != "NONE" ] && [ $sub != "Pu" ] ) || [ $groom != "NONE" ] ) ; then 
                                 continue
                             fi
                             if ( [ $object == "Calo" ] || [ $system == "pp" ] ) && ( [ $sub == "Cs" ] ) ; then

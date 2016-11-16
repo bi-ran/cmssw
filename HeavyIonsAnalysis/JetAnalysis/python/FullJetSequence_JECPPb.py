@@ -45,7 +45,7 @@ PFTowers.src = cms.InputTag("particleFlow")
 
 jetSequences = cms.Sequence(
     akGenJets +
-    ppReRecoPFJets +
+#    ppReRecoPFJets +
 #    ppReRecoCaloJets +
     #kt2PFJets +
     #kt4PFJets +

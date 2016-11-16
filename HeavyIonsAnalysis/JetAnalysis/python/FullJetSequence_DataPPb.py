@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import *
 
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_data_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.ak3PFJetSequence_pPb_data_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pPb_data_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_data_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pPb_data_cff import *
@@ -34,6 +35,7 @@ jetSequences = cms.Sequence(
     PFTowers +
     hiReRecoPFJets +
     highPurityTracks +
+    ak3PFJetSequence +
     ak4PFJetSequence +
     akPu4PFJetSequence +
     ak4CaloJetSequence +

@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import *
 
+from HeavyIonsAnalysis.JetAnalysis.jets.ak3PFJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pp_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_jec_cff import *
@@ -24,10 +25,13 @@ from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
 ak5GenJets = ak5GenJets
 ak4GenJets = ak5GenJets.clone(rParam = 0.4, src = cms.InputTag("genParticlesForJetsNoNu"))
 from RecoJets.Configuration.GenJetParticles_cff import *
+ak3GenJets = ak3GenJets.clone(rParam = 0.3, src = cms.InputTag("genParticlesForJetsNoNu"))
+from RecoJets.Configuration.GenJetParticles_cff import *
 
 akGenJets = cms.Sequence(
     genParticlesForJetsNoNu +
-    ak4GenJets
+    ak4GenJets +
+    ak3GenJets
 )
 
 from HeavyIonsAnalysis.JetAnalysis.makePartons_cff import *
@@ -41,7 +45,7 @@ PFTowers.src = cms.InputTag("particleFlow")
 
 jetSequences = cms.Sequence(
     akGenJets +
-#    ppReRecoPFJets +
+    ppReRecoPFJets +
 #    ppReRecoCaloJets +
     #kt2PFJets +
     #kt4PFJets +
@@ -52,6 +56,7 @@ jetSequences = cms.Sequence(
     #hiFJGridEmptyAreaCalculator +
     makePartons +
     highPurityTracks +
+    ak3PFJetSequence +
     ak4PFJetSequence +
     akPu4PFJetSequence +
     ak4CaloJetSequence +

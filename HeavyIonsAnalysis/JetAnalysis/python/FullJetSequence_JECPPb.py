@@ -25,7 +25,7 @@ from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
 ak5GenJets = ak5GenJets
 ak4GenJets = ak5GenJets.clone(rParam = 0.4, src = cms.InputTag("genParticlesForJetsNoNu"))
 from RecoJets.Configuration.GenJetParticles_cff import *
-ak3GenJets = ak3GenJets.clone(rParam = 0.3, src = cms.InputTag("genParticlesForJetsNoNu"))
+ak3GenJets = ak5GenJets.clone(rParam = 0.3, src = cms.InputTag("genParticlesForJetsNoNu"))
 from RecoJets.Configuration.GenJetParticles_cff import *
 
 akGenJets = cms.Sequence(

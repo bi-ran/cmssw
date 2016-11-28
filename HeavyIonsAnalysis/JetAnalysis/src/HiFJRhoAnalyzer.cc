@@ -56,6 +56,17 @@ HiFJRhoAnalyzer::HiFJRhoAnalyzer(const edm::ParameterSet& iConfig)
   etaToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "etaMap" ));
   rhoToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rho" ));
   rhomToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhom" ));
+  rhoCorrToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhoCorr" ));
+  rhomCorrToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhomCorr" ));
+  rhoCorr1BinToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhoCorr1Bin" ));
+  rhomCorr1BinToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhomCorr1Bin" ));
+  //rhoGridToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "rhoGrid" ));
+  //meanRhoGridToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "meanRhoGrid" ));
+  //etaMinRhoGridToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "etaMinRhoGrid" ));
+  //etaMaxRhoGridToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "etaMaxRhoGrid" ));
+  ptJetsToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "ptJets" ));
+  areaJetsToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "areaJets" ));
+  etaJetsToken_ = consumes<std::vector<double>>(iConfig.getParameter<edm::InputTag>( "etaJets" ));
 }
 
 
@@ -80,22 +91,80 @@ void HiFJRhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   rhoObj_.etaMax.clear();
   rhoObj_.rho.clear();
   rhoObj_.rhom.clear();
+  rhoObj_.rhoCorr.clear();
+  rhoObj_.rhomCorr.clear();
+  rhoObj_.rhoCorr1Bin.clear();
+  rhoObj_.rhomCorr1Bin.clear();
+  
+  rhoObj_.rhoGrid.clear();
+  rhoObj_.meanRhoGrid.clear();
+  rhoObj_.etaMinRhoGrid.clear();
+  rhoObj_.etaMaxRhoGrid.clear();
+  
+  rhoObj_.ptJets.clear();
+  rhoObj_.areaJets.clear();
+  rhoObj_.etaJets.clear();
   
   // Get the vector of background densities
   edm::Handle<std::vector<double>> etaRanges;
   edm::Handle<std::vector<double>> rho;
   edm::Handle<std::vector<double>> rhom;
+  edm::Handle<std::vector<double>> rhoCorr;
+  edm::Handle<std::vector<double>> rhomCorr;
+  edm::Handle<std::vector<double>> rhoCorr1Bin;
+  edm::Handle<std::vector<double>> rhomCorr1Bin;
+  
+  // edm::Handle<std::vector<double>> rhoGrid;
+  // edm::Handle<std::vector<double>> meanRhoGrid;
+  // edm::Handle<std::vector<double>> etaMinRhoGrid;
+  // edm::Handle<std::vector<double>> etaMaxRhoGrid;
+  
+  edm::Handle<std::vector<double>> ptJets;
+  edm::Handle<std::vector<double>> areaJets;
+  edm::Handle<std::vector<double>> etaJets;
+  
   iEvent.getByToken(etaToken_, etaRanges);
   iEvent.getByToken(rhoToken_, rho);
   iEvent.getByToken(rhomToken_, rhom);
-
+  iEvent.getByToken(rhoCorrToken_, rhoCorr);
+  iEvent.getByToken(rhomCorrToken_, rhomCorr);
+  iEvent.getByToken(rhoCorr1BinToken_, rhoCorr1Bin);
+  iEvent.getByToken(rhomCorr1BinToken_, rhomCorr1Bin);
+  // iEvent.getByToken(rhoGridToken_, rhoGrid);
+  // iEvent.getByToken(meanRhoGridToken_, meanRhoGrid);
+  // iEvent.getByToken(etaMinRhoGridToken_, etaMinRhoGrid);
+  // iEvent.getByToken(etaMaxRhoGridToken_, etaMaxRhoGrid);
+  
+  iEvent.getByToken(ptJetsToken_, ptJets);
+  iEvent.getByToken(areaJetsToken_, areaJets);
+  iEvent.getByToken(etaJetsToken_, etaJets);
+  
   int neta = (int)etaRanges->size();
   for(int ieta = 0; ieta<(neta-1); ieta++) {
     rhoObj_.etaMin.push_back(etaRanges->at(ieta));
     rhoObj_.etaMax.push_back(etaRanges->at(ieta+1));
     rhoObj_.rho.push_back(rho->at(ieta));
     rhoObj_.rhom.push_back(rhom->at(ieta));
+    rhoObj_.rhoCorr.push_back(rhoCorr->at(ieta));
+    rhoObj_.rhomCorr.push_back(rhomCorr->at(ieta));
+    rhoObj_.rhoCorr1Bin.push_back(rhoCorr1Bin->at(ieta));
+    rhoObj_.rhomCorr1Bin.push_back(rhomCorr1Bin->at(ieta));
   }
+
+  int njets = (int)ptJets->size();
+  for(int ijet = 0; ijet<njets; ijet++) {
+    rhoObj_.ptJets.push_back(ptJets->at(ijet));
+    rhoObj_.areaJets.push_back(areaJets->at(ijet));
+    rhoObj_.etaJets.push_back(etaJets->at(ijet));
+  }
+  
+  // int netaGrid = (int)rhoGrid->size();
+  // for(int igrid = 0; igrid<netaGrid; igrid++) {
+  //   rhoObj_.rhoGrid.push_back(rhoGrid->at(igrid));
+  //   rhoObj_.meanRhoGrid.push_back(meanRhoGrid->at(igrid));
+  //   rhoObj_.etaMinRhoGrid.push_back(etaMinRhoGrid->at(igrid));
+  //   rhoObj_.etaMaxRhoGrid.push_back(etaMaxRhoGrid->at(igrid));
+  // }
   
   tree_->Fill();
 }
@@ -112,6 +181,17 @@ HiFJRhoAnalyzer::beginJob()
   tree_->Branch("etaMax",&(rhoObj_.etaMax));
   tree_->Branch("rho",&(rhoObj_.rho));
   tree_->Branch("rhom",&(rhoObj_.rhom));
+  tree_->Branch("rhoCorr",&(rhoObj_.rhoCorr));
+  tree_->Branch("rhomCorr",&(rhoObj_.rhomCorr));
+  tree_->Branch("rhoCorr1Bin",&(rhoObj_.rhoCorr1Bin));
+  tree_->Branch("rhomCorr1Bin",&(rhoObj_.rhomCorr1Bin));
+  tree_->Branch("rhoGrid",&(rhoObj_.rhoGrid));
+  tree_->Branch("meanRhoGrid",&(rhoObj_.meanRhoGrid));
+  tree_->Branch("etaMinRhoGrid",&(rhoObj_.etaMinRhoGrid));
+  tree_->Branch("etaMaxRhoGrid",&(rhoObj_.etaMaxRhoGrid));
+  tree_->Branch("ptJets",&(rhoObj_.ptJets));
+  tree_->Branch("etaJets",&(rhoObj_.etaJets));
+  tree_->Branch("areaJets",&(rhoObj_.areaJets));
 }
 
 // ------------ method called once each job just after ending the event loop  ------------

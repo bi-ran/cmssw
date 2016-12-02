@@ -7,15 +7,15 @@ anaTrack.doSimVertex = True
 anaTrack.doSimTrack = True 
 anaTrack.fillSimTrack = True
 
-anaTrack.simTrackPtMin = 0.49
+anaTrack.simTrackPtMin = 0.1
 
-pixelTrack.simTrackPtMin = 0.4
+pixelTrack.simTrackPtMin = 0.1
 
 ppTrack.doSimVertex = True
 ppTrack.doSimTrack = True
 ppTrack.fillSimTrack = True
 
-ppTrack.simTrackPtMin = 0.49
+ppTrack.simTrackPtMin = 0.1
 ppTrack.associatorMap = cms.InputTag('tpRecoAssocGeneralTracks')
 
 tpRecoAssocGeneralTracks = trackingParticleRecoTrackAsssociation.clone()

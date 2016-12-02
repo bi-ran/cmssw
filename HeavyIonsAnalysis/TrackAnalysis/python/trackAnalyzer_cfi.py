@@ -1,8 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 anaTrack = cms.EDAnalyzer('TrackAnalyzer',
-                          trackPtMin = cms.untracked.double(0.4),
-                          simTrackPtMin = cms.untracked.double(0.4),
+                          trackPtMin = cms.untracked.double(0.01),
+                          simTrackPtMin = cms.untracked.double(0.1),
                           vertexSrc = cms.vstring('hiSelectedVertex'),
                           trackSrc = cms.InputTag('hiGeneralTracks'),
                           mvaSrc = cms.InputTag('hiGeneralTracks','MVAVals'),

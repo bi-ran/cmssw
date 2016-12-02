@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from HeavyIonsAnalysis.TrackAnalysis.trackAnalyzer_cff import *
 
-anaTrack.trackPtMin = 0.40
+anaTrack.trackPtMin = 0.01
 anaTrack.useQuality = False
 anaTrack.doPFMatching = True
 anaTrack.doSimVertex = False  
@@ -13,7 +13,7 @@ anaTrack.qualityStrings = cms.untracked.vstring(['highPurity','tight','loose'])
 
 pixelTrack = anaTrack.clone(trackSrc = cms.InputTag("hiGeneralAndPixelTracks"),
                             useQuality = False,
-							trackPtMin = 0.4,
+							trackPtMin = 0.01,
 							qualityStrings = cms.untracked.vstring('highPurity'))
 
 ppTrack = anaTrack.clone(trackSrc = cms.InputTag("generalTracks"),

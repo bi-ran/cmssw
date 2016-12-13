@@ -755,46 +755,35 @@ def overrideJEC_pPb8TeV(process):
     process.GlobalTag.toGet.extend([
 ## no PU
        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
-                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
-                 label = cms.untracked.string("AK4Calo")
-             ),
-        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
-                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
-                 label = cms.untracked.string("AK4PF")
-             ),
-##adding PU = nonPU TEMPORARILY
-	    cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4Calo_offline"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AK4Calo_offline")
              ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4PF_offline"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AK4PF_offline")
              ),
-	cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
-                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
-                 label = cms.untracked.string("AKPu4Calo")
-             ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4PF_offline"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
-                 label = cms.untracked.string("AKPu4PF")
-	     ),
+                 label = cms.untracked.string("AK3PF_offline")
+             ),
 	cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4Calo"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4Calo_offline"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AKPu4Calo_offline")
              ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_Spring16_25nsV6_MC_AK4PF"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4PF_offline"),
                  connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
                  label = cms.untracked.string("AKPu4PF_offline")
-             )
+	     ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_pA_80X_8160GeV_v0_AK4PF_offline"),
+                 connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+                 label = cms.untracked.string("AKPu3PF_offline")
+	     )
     ])
     return process
 

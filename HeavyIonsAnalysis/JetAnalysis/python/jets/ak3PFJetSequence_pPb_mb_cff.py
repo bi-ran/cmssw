@@ -161,11 +161,11 @@ ak3PFpatJetsWithBtagging = patJets.clone(jetSource = cms.InputTag("ak3PFJets"),
         addAssociatedTracks = True,
         addJetCharge = False,
         addJetID = False,
-        getJetMCFlavour = False,
-        addGenPartonMatch = False,
-        addGenJetMatch = False,
-        embedGenJetMatch = False,
-        embedGenPartonMatch = False,
+        getJetMCFlavour = True,
+        addGenPartonMatch = True,
+        addGenJetMatch = True,
+        embedGenJetMatch = True,
+        embedGenPartonMatch = True,
         # embedCaloTowers = False,
         # embedPFCandidates = True
         )
@@ -183,9 +183,9 @@ ak3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJet
                                                              matchTag = 'patJetsWithBtagging',
                                                              pfCandidateLabel = cms.untracked.InputTag('particleFlow'),
                                                              trackTag = cms.InputTag("generalTracks"),
-                                                             fillGenJets = False,
-                                                             isMC = False,
-							     doSubEvent = False,
+                                                             fillGenJets = True,
+                                                             isMC = True,
+							     doSubEvent = True,
                                                              useHepMC = cms.untracked.bool(False),
 							     genParticles = cms.untracked.InputTag("genParticles"),
 							     eventInfoTag = cms.InputTag("generator"),
@@ -199,7 +199,7 @@ ak3PFJetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJet
 							     doSubJets = cms.untracked.bool(False),
                                                              doGenSubJets = cms.untracked.bool(False),     
                                                              subjetGenTag = cms.untracked.InputTag("ak3GenJets"),
-                                                             doGenTaus = False
+                                                             doGenTaus = True
                                                              )
 
 ak3PFJetSequence_mc = cms.Sequence(
@@ -248,4 +248,4 @@ ak3PFJetSequence_data = cms.Sequence(ak3PFcorr
 ak3PFJetSequence_jec = cms.Sequence(ak3PFJetSequence_mc)
 ak3PFJetSequence_mb = cms.Sequence(ak3PFJetSequence_mc)
 
-ak3PFJetSequence = cms.Sequence(ak3PFJetSequence_data)
+ak3PFJetSequence = cms.Sequence(ak3PFJetSequence_mb)

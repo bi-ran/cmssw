@@ -19,7 +19,7 @@ do
                         do
 			    # no Cs Calo or pp jets
 			    
-                            if ( [ $system == "pPb" ] ) && ( [ $radius -ne 4 ] || ( [ $sub != "NONE" ] && [ $sub != "Pu" ] ) || [ $groom != "NONE" ] ) ; then 
+                            if ( [ $system == "pPb" ] ) && ( ( [ $radius -ne 4 ] && [ $radius -ne 3 ] ) || ( [ $sub != "NONE" ] && [ $sub != "Pu" ] ) || [ $groom != "NONE" ] ) ; then 
                                 continue
                             fi
                             if ( [ $object == "Calo" ] || [ $system == "pp" ] ) && ( [ $sub == "Cs" ] ) ; then
@@ -63,6 +63,7 @@ do
                             
                             if [ $system == "pp" ] || [ $system == "pPb" ]; then
                                 #corrlabel="_generalTracks"
+                                corrlabel="_offline"
                                 tracks="generalTracks"
 			        vertex="offlinePrimaryVertices"
                                 genparticles="genParticles"
@@ -83,9 +84,6 @@ do
                             fi
                             if [ $system == "pp" ]; then
                                 doTower="False"
-                            fi
-                            if [ $system == "pPb" ]; then 
-                                corrlabel=""
                             fi
 			    if [ $sub == "Pu" ]; then
 			        corrname=`echo ${algo} | sed 's/\(.*\)/\U\1/'`${sub}${radius}${object}${corrlabel}

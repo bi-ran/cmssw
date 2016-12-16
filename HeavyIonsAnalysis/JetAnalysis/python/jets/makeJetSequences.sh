@@ -69,7 +69,7 @@ do
                                 genparticles="genParticles"
                                 partons="genParticles"
                                 pflow="particleFlow"
-			        if [ $sample == "data" ] && [ $sub == "NONE" ] && [ $radius == 4 ] && [ $object == "PF" ]; then
+			        if [ $sample == "data" ] && [ $system != "pPb" ] && [ $sub == "NONE" ] && [ $radius == 4 ] && [ $object == "PF" ]; then
 				    jetcorrectionlevels="\'L2Relative\',\'L3Absolute\',\'L2L3Residual\'"
 			        fi
                             fi

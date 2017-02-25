@@ -190,13 +190,13 @@ process.hltMuTree.vertices = cms.InputTag("offlinePrimaryVertices")
 #########################
 process.ana_step = cms.Path(process.hltanalysis *
 			    process.hltobject *
-                            #process.centralityBin *
-			    #process.hiEvtAnalyzer *
+                            process.centralityBin *
+			    process.hiEvtAnalyzer *
                             process.jetSequences +
                             process.egmGsfElectronIDSequence + #Should be added in the path for VID module
                             process.ggHiNtuplizer +
                             process.ggHiNtuplizerGED +
-                            #process.hiFJRhoAnalyzer +
+                            process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
 			    process.hltMuTree +
                             process.HiForest +

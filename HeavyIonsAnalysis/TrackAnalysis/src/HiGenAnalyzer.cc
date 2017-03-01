@@ -333,9 +333,8 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       Float_t e = (*it)->momentum().e();
       Float_t mass = (*it)->momentum().m();      
       const ParticleData * part = pdt->particle(pdg_id );
-      Int_t charge = static_cast<Int_t>(part->charge());
-      if (chargedOnly_&&charge==0) continue;
-
+      Int_t charge = -999;
+      if(part) charge = static_cast<Int_t>(part->charge());
       hev_.E.push_back( e);
       hev_.mass.push_back( mass);
       hev_.pt.push_back( pt);
@@ -345,7 +344,7 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       hev_.chg.push_back( charge);
       hev_.sta.push_back( (*it)->status());
       hev_.matchingID.push_back( nparticles);
-
+      
       eta = fabs(eta);
       Int_t etabin = 0;
       if(eta > 0.5) etabin = 1;
@@ -401,6 +400,7 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // if(hev_.mult >= MAXPARTICLES)
       // 	edm::LogError("Number of genparticles exceeds array bounds.");
     }
+  
     if(doHI_){
       edm::Handle<edm::GenHIEvent> higen;
       iEvent.getByToken(genHIsrc_,higen);
@@ -432,11 +432,9 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       vr = vertex.position().rho();
     }
   }
-
   for(Int_t i = 0; i<3; ++i){
     hev_.ptav[i] = hev_.ptav[i]/hev_.n[i];
   }
-
   hev_.b = b;
   hev_.scale = scale;
   hev_.npart = npart;

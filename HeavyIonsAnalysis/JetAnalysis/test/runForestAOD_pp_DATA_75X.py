@@ -100,8 +100,8 @@ process.jetSequences = cms.Sequence(
     )
 
 # How to turn on the jet constituents 
-process.ak4PFJetAnalyzer.doJetConstituents = cms.untracked.bool(True)
-process.ak4PFJetAnalyzer.doNewJetVars = cms.untracked.bool(True)
+#process.ak4PFJetAnalyzer.doJetConstituents = cms.untracked.bool(True)
+#process.ak4PFJetAnalyzer.doNewJetVars = cms.untracked.bool(True)
 
 
 #####################################################################################

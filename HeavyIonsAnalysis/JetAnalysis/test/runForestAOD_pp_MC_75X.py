@@ -72,6 +72,10 @@ process.TFileService = cms.Service("TFileService",
 #############################
 
 process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_nominalPP")
+
+# Include this to turn on storing the jet constituents and new jet variables for q/g separation
+#process.ak4PFJetAnalyzer.doJetConstituents = cms.untracked.bool(True)
+#process.ak4PFJetAnalyzer.doNewJetVars = cms.untracked.bool(True)
 # Use this version for JEC
 #process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPP")
 

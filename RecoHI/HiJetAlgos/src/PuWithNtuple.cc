@@ -1,4 +1,4 @@
-#include "RecoHI/HiJetAlgos/interface/MultipleAlgoIterator.h"
+#include "RecoHI/HiJetAlgos/interface/PuWithNtuple.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -6,11 +6,12 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 using namespace std;
 
-MultipleAlgoIterator::MultipleAlgoIterator(const edm::ParameterSet& iConfig, edm::ConsumesCollector && iC) :
+PuWithNtuple::PuWithNtuple(const edm::ParameterSet& iConfig, edm::ConsumesCollector && iC) : 
   PileUpSubtractor(iConfig, std::move(iC)),
   sumRecHits_(iConfig.getParameter<bool>("sumRecHits")),
   dropZeroTowers_(iConfig.getUntrackedParameter<bool>("dropZeroTowers",true))
 {
+  
   if(iConfig.exists("minimumTowersFraction")){
     minimumTowersFraction_ = iConfig.getParameter<double>("minimumTowersFraction");
     cout<<"LIMITING THE MINIMUM TOWERS FRACTION TO : "<<minimumTowersFraction_<<endl;
@@ -18,9 +19,43 @@ MultipleAlgoIterator::MultipleAlgoIterator(const edm::ParameterSet& iConfig, edm
     minimumTowersFraction_ = 0;
     cout<<"ATTENTION - NOT LIMITING THE MINIMUM TOWERS FRACTION"<<endl;
   }
+
+  Neta_ = 82;
+
+  tree_ = fs_->make<TTree>("puTree","");
+
+  tree_->Branch("nref",&nref,"nref/I");
+  tree_->Branch("jteta",jteta,"jteta[nref]/F");
+  tree_->Branch("jtphi",jtphi,"jtphi[nref]/F");
+  tree_->Branch("jtpt",jtpt,"jtpt[nref]/F");
+  tree_->Branch("jtexngeom",jtexngeom,"jtexngeom[nref]/I");
+  tree_->Branch("jtexntow",jtexntow,"jtexntow[nref]/I");
+
+  tree_->Branch("jtexpt",jtexpt,"jtexpt[nref]/F");
+  tree_->Branch("jtpu",jtpu,"jtpu[nref]/F");
+
+  tree_->Branch("ngeom",vngeom,"ngeom[82]/I");
+  tree_->Branch("ntow",vntow,"ntow[82]/I");
+
+  tree_->Branch("eta",veta,"eta[82]/F");
+  tree_->Branch("ieta",vieta,"ieta[82]/I");
+
+  tree_->Branch("mean0",vmean0,"mean0[82]/F");
+  tree_->Branch("rms0",vrms0,"rms0[82]/F");
+
+  tree_->Branch("mean1",vmean1,"mean1[82]/F");
+  tree_->Branch("rms1",vrms1,"rms1[82]/F");
+
+  const double etatow[42] = {0.000, 0.087, 0.174, 0.261, 0.348, 0.435, 0.522, 0.609, 0.696, 0.783, 0.870, 0.957, 1.044, 1.131, 1.218, 1.305, 1.392, 1.479, 1.566, 1.653, 1.740, 1.830, 1.930, 2.043, 2.172, 2.322, 2.500, 2.650, 2.853, 3.000, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191, 4.363, 4.538, 4.716, 4.889, 5.191};
+
+  for(int i=0;i<42;i++){
+    etaedge[i]=etatow[i];
+  }
+
 }
 
-void MultipleAlgoIterator::rescaleRMS(double s){
+
+void PuWithNtuple::rescaleRMS(double s){
    for ( std::map<int, double>::iterator iter = esigma_.begin();
 	 iter != esigma_.end(); ++iter ){
       iter->second = s*(iter->second);
@@ -28,7 +63,7 @@ void MultipleAlgoIterator::rescaleRMS(double s){
 }
 
 
-void MultipleAlgoIterator::offsetCorrectJets()
+void PuWithNtuple::offsetCorrectJets()
 {
 
   LogDebug("PileUpSubtractor")<<"The subtractor correcting jets...\n";
@@ -77,7 +112,7 @@ void MultipleAlgoIterator::offsetCorrectJets()
   }
 }
 
-void MultipleAlgoIterator::subtractPedestal(vector<fastjet::PseudoJet> & coll)
+void PuWithNtuple::subtractPedestal(vector<fastjet::PseudoJet> & coll)
 {
 
    LogDebug("PileUpSubtractor")<<"The subtractor subtracting pedestals...\n";
@@ -121,7 +156,7 @@ void MultipleAlgoIterator::subtractPedestal(vector<fastjet::PseudoJet> & coll)
 
 }
 
-void MultipleAlgoIterator::calculatePedestal( vector<fastjet::PseudoJet> const & coll )
+void PuWithNtuple::calculatePedestal( vector<fastjet::PseudoJet> const & coll )
 {
    LogDebug("PileUpSubtractor")<<"The subtractor calculating pedestals...\n";
 
@@ -132,6 +167,33 @@ void MultipleAlgoIterator::calculatePedestal( vector<fastjet::PseudoJet> const &
    int ieta0 = -100;
    
    // Initial values for emean_, emean2, esigma_, ntowers
+
+
+   for(int vi = 0; vi < Neta_; ++vi){
+     int it = vi+1;
+     if(it > Neta_/2) it = vi - Neta_;
+
+     int sign = 1;
+     if(it < 0){
+       sign = -1;
+     }
+     
+     vieta[vi] = it;
+     veta[vi] = sign*(etaedge[abs(it)] + etaedge[abs(it)-1])/2.;
+
+     vngeom[vi] = -99;
+     vntow[vi] = -99;
+
+     vmean1[vi] = -99;
+     vrms1[vi] = -99;
+
+     if((*(ntowersWithJets_.find(it))).second == 0){
+       vmean0[vi] = -99;
+       vrms0[vi] = -99;
+     }
+
+   }
+
 
    for(int i = ietamin_; i < ietamax_+1; i++)
       {
@@ -172,10 +234,17 @@ void MultipleAlgoIterator::calculatePedestal( vector<fastjet::PseudoJet> const &
       {
 
 	 int it = (*gt).first;
+	 int vi = it-1;
+	 if(it < 0) vi = Neta_ + it;
        
 	 double e1 = (*(emean_.find(it))).second;
 	 double e2 = (*emean2.find(it)).second;
 	 int nt = (*gt).second - (*(ntowersWithJets_.find(it))).second;
+
+	 if(vi < Neta_){
+	   vngeom[vi] = (*gt).second;
+	   vntow[vi] = nt;
+	 }
 
 	 LogDebug("PileUpSubtractor")<<" ieta : "<<it<<" number of towers : "<<nt<<" e1 : "<<e1<<" e2 : "<<e2<<"\n";
         
@@ -184,6 +253,15 @@ void MultipleAlgoIterator::calculatePedestal( vector<fastjet::PseudoJet> const &
 	    double eee = e2/nt - e1*e1/(nt*nt);    
 	    if(eee<0.) eee = 0.;
 	    esigma_[it] = nSigmaPU_*sqrt(eee);
+
+	    if(vi < Neta_){
+	      vmean1[vi] = emean_[it];
+	      vrms1[vi] = esigma_[it];
+	      if(vngeom[vi] == vntow[vi]){
+		vmean0[vi] = emean_[it];
+		vrms0[vi] = esigma_[it];
+	      }
+	    }
 	 }
 	 else
 	    {
@@ -195,8 +273,7 @@ void MultipleAlgoIterator::calculatePedestal( vector<fastjet::PseudoJet> const &
 }
 
 
-
-void MultipleAlgoIterator::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanInput)
+void PuWithNtuple::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanInput)
 {
 
   LogDebug("PileUpSubtractor")<<"The subtractor calculating orphan input...\n";
@@ -211,9 +288,21 @@ void MultipleAlgoIterator::calculateOrphanInput(vector<fastjet::PseudoJet> & orp
 
   //  cout<<"First iteration found N jets : "<<fjJets_->size()<<endl;
 
+  nref = 0;
+
   for (; pseudojetTMP != fjJetsEnd ; ++pseudojetTMP) {
 
     //    cout<<"Jet with pt "<<pseudojetTMP->perp()<<" to be excluded"<<endl;
+
+
+    if(nref < 200){
+      jtexngeom[nref] = 0;
+      jtexntow[nref] = 0;      
+      jtexpt[nref] = 0;
+      jtpt[nref] = pseudojetTMP->perp();
+      jteta[nref] = pseudojetTMP->eta();
+      jtphi[nref] = pseudojetTMP->phi();
+    }
 
     if(pseudojetTMP->perp() < puPtMin_) continue;
 
@@ -233,6 +322,8 @@ void MultipleAlgoIterator::calculateOrphanInput(vector<fastjet::PseudoJet> & orp
 
 	  //          cout<<"At ieta : "<<(*im).ieta()<<" -  excluded so far : "<<ntowersWithJets_[(*im).ieta()]<<" out of max "<<geomtowers_[(*im).ieta()]<<endl;
           excludedTowers.push_back(pair<int,int>(im->ieta(),im->iphi()));
+
+	  if(nref < 200) jtexngeom[nref]++;  
         }
       }
 
@@ -246,10 +337,30 @@ void MultipleAlgoIterator::calculateOrphanInput(vector<fastjet::PseudoJet> & orp
       vector<pair<int,int> >::const_iterator exclude = find(excludedTowers.begin(),excludedTowers.end(),pair<int,int>(ie,ip));
       if(exclude != excludedTowers.end()) {
         jettowers.push_back(index);
+	//        cout<<"tower with index "<<index<<" excluded."<<endl;
+	//        cout<<"jettowers now : "<<jettowers.size()<<endl;
       }
     } // initial input collection
 
-  }// pseudojets
+
+    for (it = fjInputs_->begin(); it != fjInputsEnd; ++it ) {
+      int index = it->user_index();
+      const reco::CandidatePtr& originalTower = (*inputs_)[index];
+      double dr = reco::deltaR((*it),(*pseudojetTMP));
+
+      if(dr < radiusPU_){
+	if(nref < 200){
+	  jtexntow[nref]++;
+	  jtexpt[nref] += originalTower->pt();
+	}
+      }
+
+    }
+
+
+
+    if(nref < 200) nref++;
+  } // pseudojets
 
   //
   // Create a new collections from the towers not included in jets
@@ -268,11 +379,21 @@ void MultipleAlgoIterator::calculateOrphanInput(vector<fastjet::PseudoJet> & orp
     }
   }
 
+  //  cout<<"Number of jets : "<<nref<<endl;
+
+  tree_->Fill();
+
 }
 
 
 
-double MultipleAlgoIterator::getEt(const reco::CandidatePtr & in) const {
+
+
+
+
+
+
+double PuWithNtuple::getEt(const reco::CandidatePtr & in) const {
    const CaloTower* ctc = dynamic_cast<const CaloTower*>(in.get());
    const GlobalPoint& pos=geo_->getPosition(ctc->id());
    double energy = ctc->emEnergy() + ctc->hadEnergy();
@@ -280,7 +401,7 @@ double MultipleAlgoIterator::getEt(const reco::CandidatePtr & in) const {
    return et;
 }
 
-double MultipleAlgoIterator::getEta(const reco::CandidatePtr & in) const {
+double PuWithNtuple::getEta(const reco::CandidatePtr & in) const {
    const CaloTower* ctc = dynamic_cast<const CaloTower*>(in.get());
    const GlobalPoint& pos=geo_->getPosition(ctc->id());
    double eta = pos.eta();

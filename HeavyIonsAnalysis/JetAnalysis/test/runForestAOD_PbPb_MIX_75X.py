@@ -79,8 +79,10 @@ process.load('HeavyIonsAnalysis.JetAnalysis.GenJetSequence')
 process.load('HeavyIonsAnalysis.JetAnalysis.hiSignalGenFilters')
 
 
+#PU minimal tower cut reco sequence
+process.load('HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedPbPb')
 # nominal jet reco sequence
-process.load('HeavyIonsAnalysis.JetAnalysis.FullJetSequence_nominalPbPb')
+#process.load('HeavyIonsAnalysis.JetAnalysis.FullJetSequence_nominalPbPb')
 # replace above with this one for JEC:
 #process.load('HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPbPb')
 

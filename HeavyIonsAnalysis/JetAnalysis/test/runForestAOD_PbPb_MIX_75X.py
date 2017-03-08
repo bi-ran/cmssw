@@ -50,12 +50,23 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '75X_mcRun2_HeavyIon_v13', '') #for now track GT manually, since centrality tables updated ex post facto
 process.HiForest.GlobalTagLabel = process.GlobalTag.globaltag
 
+#overwrite GT for centrality table for Cymbal5Ev8 tune
+process.GlobalTag.snapshotTime = cms.string("9999-12-31 23:59:59.000")
+process.GlobalTag.toGet.extend([
+   cms.PSet(record = cms.string("HeavyIonRcd"),
+      tag = cms.string("CentralityTable_HFtowers200_HydjetCymbal5Ev8_v758x01_mc"),
+      connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
+      label = cms.untracked.string("HFtowersHydjetCymbal5Ev8")
+   ),
+])
+
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import overrideJEC_PbPb5020
 process = overrideJEC_PbPb5020(process)
 
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
-# process.centralityBin.Centrality = cms.InputTag("hiCentrality")
-# process.centralityBin.centralityVariable = cms.string("HFtowers")
+process.centralityBin.Centrality = cms.InputTag("hiCentrality")
+process.centralityBin.centralityVariable = cms.string("HFtowers")
+process.centralityBin.nonDefaultGlauberModel = cms.string("HydjetCymbal5Ev8")
 #process.centralityBin.nonDefaultGlauberModel = cms.string("HydjetDrum5")
 
 #####################################################################################

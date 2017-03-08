@@ -48,7 +48,7 @@ process.load('Configuration.Geometry.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.load("CondCore.CondDB.CondDB_cfi")
  
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
@@ -90,7 +90,10 @@ process.TFileService = cms.Service("TFileService",
 # Jets
 #############################
 
-process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPPb")
+#Pu v2 settings with minimum tower threshold
+process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedpPb")
+#nominal (Pu v1 settings)
+#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPPb")
 # Use this version for JEC
 #process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_JECPP")
 
@@ -193,8 +196,8 @@ process.load('HeavyIonsAnalysis.JetAnalysis.hiFJRhoAnalyzer_cff')
 #####################
 # D-Meson Analyzer
 #####################
-from Bfinder.finderMaker.OnlyTrack_finderMaker_80X_pPb_cff import OnlyTrack_finderMaker_80X_pPb
-OnlyTrack_finderMaker_80X_pPb(process)
+#from Bfinder.finderMaker.OnlyTrack_finderMaker_80X_pPb_cff import OnlyTrack_finderMaker_80X_pPb
+#OnlyTrack_finderMaker_80X_pPb(process)
 
 #####################
 # Muon Analyzer
@@ -217,7 +220,7 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.ggHiNtuplizerGED +
                             process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
-			    process.DfinderSequence +
+#			    process.DfinderSequence +
 			    process.hltMuTree +
                             process.HiForest +
 			    process.trackSequencesPP +

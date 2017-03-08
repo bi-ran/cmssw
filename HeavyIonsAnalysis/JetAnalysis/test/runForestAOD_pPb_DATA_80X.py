@@ -27,7 +27,7 @@ process.HiForest.HiForestVersion = cms.string(version)
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(
-				'file:/afs/cern.ch/user/k/kjung/run2Validation/HLTchecks/CMSSW_8_0_22/src/pPb_5TeVEpos_RECO.root'
+				'/store/hidata/PARun2016C/PAEGJet1/AOD/PromptReco-v1/000/285/480/00000/084460F7-37AF-E611-968F-FA163EF45E0B.root'
 				)
 )
 
@@ -45,7 +45,7 @@ process.load('Configuration.Geometry.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.load('CondCore.CondDB.CondDB_cfi')
  
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
@@ -86,7 +86,10 @@ process.TFileService = cms.Service("TFileService",
 # Jets
 #############################
 
-process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_DataPPb")
+#Pu v2 settings with minimum tower threshold
+process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedDatapPb")
+#nominal (Pu v1 settings)
+#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_DataPPb")
 
 #####################################################################################
 

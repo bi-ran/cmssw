@@ -1830,8 +1830,12 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
       
       for(int ijet = 0 ; ijet < jets_.nref; ++ijet){
         // poor man's matching, someone fix please
-        if(fabs(genjet.pt()-jets_.refpt[ijet])<0.00001 &&
-           fabs(genjet.eta()-jets_.refeta[ijet])<0.00001){
+
+	double deltaPt = fabs(genjet.pt()-jets_.refpt[ijet]); //Note: precision of this ~ .0001, so cut .01
+	double deltaEta = fabs(genjet.eta()-jets_.refeta[ijet]); //Note: precision of this is  ~.0000001, but keep it low, .0001 is well below cone size and typical pointing resolution
+	double deltaPhi = fabs(reco::deltaPhi(genjet.phi(), jets_.refphi[ijet])); //Note: precision of this is  ~.0000001, but keep it low, .0001 is well below cone size and typical pointing resolution
+
+        if(deltaPt < 0.01 && deltaEta < .0001 && deltaPhi < .0001){
           if(genjet_pt>genPtMin_) {
             jets_.genmatchindex[jets_.ngen] = (int)ijet;
             jets_.gendphijt[jets_.ngen] = reco::deltaPhi(jets_.refphi[ijet],genjet.phi());

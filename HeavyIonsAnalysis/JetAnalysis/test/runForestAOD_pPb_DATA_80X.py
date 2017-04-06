@@ -196,16 +196,16 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.centralityBin *
 			    process.hiEvtAnalyzer *
                             process.jetSequences +
-                            #process.egmGsfElectronIDSequence + #Should be added in the path for VID module
-                            #process.ggHiNtuplizer +
-                            #process.ggHiNtuplizerGED +
+                            process.egmGsfElectronIDSequence + #Should be added in the path for VID module
+                            process.ggHiNtuplizer +
+                            process.ggHiNtuplizerGED +
                             process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
 			    process.hltMuTree +
                             process.HiForest +
 			    process.trackSequencesPP +
-                            process.runAnalyzer 
-                            #process.rechitanalyzer
+                            process.runAnalyzer + 
+                            process.rechitanalyzer
 )
 
 #####################################################################################

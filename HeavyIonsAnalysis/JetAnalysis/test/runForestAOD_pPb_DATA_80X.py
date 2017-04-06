@@ -27,7 +27,7 @@ process.HiForest.HiForestVersion = cms.string(version)
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(
-				'/store/hidata/PARun2016C/PAEGJet1/AOD/PromptReco-v1/000/285/480/00000/084460F7-37AF-E611-968F-FA163EF45E0B.root'
+				'/store/hidata/PARun2016C/PAMinimumBias1/AOD/PromptReco-v1/000/285/480/00000/0C188A3E-26AF-E611-A5E2-FA163E0F1BFC.root'
 				)
 )
 
@@ -48,7 +48,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('CondCore.CondDB.CondDB_cfi')
  
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_miniAODv2_v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_v19', '')
 process.HiForest.GlobalTagLabel = process.GlobalTag.globaltag
 
 
@@ -196,16 +196,16 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.centralityBin *
 			    process.hiEvtAnalyzer *
                             process.jetSequences +
-                            process.egmGsfElectronIDSequence + #Should be added in the path for VID module
-                            process.ggHiNtuplizer +
-                            process.ggHiNtuplizerGED +
+                            #process.egmGsfElectronIDSequence + #Should be added in the path for VID module
+                            #process.ggHiNtuplizer +
+                            #process.ggHiNtuplizerGED +
                             process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
 			    process.hltMuTree +
                             process.HiForest +
 			    process.trackSequencesPP +
-                            process.runAnalyzer +
-                            process.rechitanalyzer
+                            process.runAnalyzer 
+                            #process.rechitanalyzer
 )
 
 #####################################################################################
@@ -238,14 +238,11 @@ process.NoScraping = cms.EDFilter("FilterOutScraping",
 process.pPAprimaryVertexFilter = cms.Path(process.PAprimaryVertexFilter)
 process.pBeamScrapingFilter=cms.Path(process.NoScraping)
 
-process.load("HeavyIonsAnalysis.VertexAnalysis.PAPileUpVertexFilter_cff")
-
-process.pVertexFilterCutG = cms.Path(process.pileupVertexFilterCutG)
-process.pVertexFilterCutGloose = cms.Path(process.pileupVertexFilterCutGloose)
-process.pVertexFilterCutGtight = cms.Path(process.pileupVertexFilterCutGtight)
-process.pVertexFilterCutGplus = cms.Path(process.pileupVertexFilterCutGplus)
-process.pVertexFilterCutE = cms.Path(process.pileupVertexFilterCutE)
-process.pVertexFilterCutEandG = cms.Path(process.pileupVertexFilterCutEandG)
+#update to use the new 8 TeV pileup cuts
+process.load("HeavyIonsAnalysis.VertexAnalysis.pileUpFilter_cff")
+process.pVertexFilterCutVtx1 = cms.Path(process.pileUpFilter_pPb8TeV_vtx1)
+process.pVertexFilterCutGplus = cms.Path(process.pileUpFilter_pPb8TeV_Gplus)
+process.pVertexFilterCutdz1p0 = cms.Path(process.olvFilter_pPb8TeV_dz1p0)
 
 process.pAna = cms.EndPath(process.skimanalysis)
 

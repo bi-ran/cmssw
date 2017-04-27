@@ -22,6 +22,7 @@ PuWithNtuple::PuWithNtuple(const edm::ParameterSet& iConfig, edm::ConsumesCollec
 
   Neta_ = 82;
 
+  isOrphanInputRun_ = false;
   tree_ = fs_->make<TTree>("puTree","");
 
   tree_->Branch("nref",&nref,"nref/I");
@@ -270,6 +271,13 @@ void PuWithNtuple::calculatePedestal( vector<fastjet::PseudoJet> const & coll )
 	    }
 	 LogDebug("PileUpSubtractor")<<" ieta : "<<it<<" Pedestals : "<<emean_[it]<<"  "<<esigma_[it]<<"\n";
       }
+
+
+   if(isOrphanInputRun_){   
+     tree_->Fill();
+     isOrphanInputRun_ = false;
+   }
+
 }
 
 
@@ -278,6 +286,7 @@ void PuWithNtuple::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanInput
 
   LogDebug("PileUpSubtractor")<<"The subtractor calculating orphan input...\n";
 
+  isOrphanInputRun_ = true;
   (*fjInputs_) = fjOriginalInputs_;
 
   vector<int> jettowers; // vector of towers indexed by "user_index"
@@ -380,9 +389,6 @@ void PuWithNtuple::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanInput
   }
 
   //  cout<<"Number of jets : "<<nref<<endl;
-
-  tree_->Fill();
-
 }
 
 

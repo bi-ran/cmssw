@@ -20,6 +20,7 @@ class PuWithNtuple : public PileUpSubtractor {
 
     bool sumRecHits_;
     bool dropZeroTowers_;
+    bool isOrphanInputRun_;
 
     double minimumTowersFraction_;
 

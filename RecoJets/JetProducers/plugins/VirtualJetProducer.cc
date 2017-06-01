@@ -938,6 +938,10 @@ void VirtualJetProducer::writeJetsWithConstituents(  edm::Event & iEvent, edm::E
     pVec.SetPxPyPzE(constit.px(),constit.py(),constit.pz(),constit.e());
     pCand.setP4(pVec);
     pCand.setSourceCandidatePtr( orig->sourceCandidatePtr(0) );
+    if(verbosity_ >= 1 && constit.pt()>2.) {
+      std::cout << "orig pt: " << orig->pt() << " phi: " << orig->phi() << " eta: " << orig->eta() << std::endl;
+      std::cout << "new pt: " << constit.pt() << " phi: " << constit.phi() << " eta: " << constit.eta() << std::endl;
+    }
     constituentCollection->push_back(pCand);
   }
   // put constituents into event record

@@ -167,7 +167,7 @@ void CSJetProducer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iS
       double subtracted_mtMinusPt=0;
       if (particles_fraction_of_mtMinusPt[i]>0) subtracted_mtMinusPt=(particles[i].mt()-particles[i].pt())*particles_fraction_of_mtMinusPt[i];
       fastjet::PseudoJet subtracted_const(subtracted_pt*cos(azimuth),subtracted_pt*sin(azimuth),(subtracted_pt+subtracted_mtMinusPt)*sinh(rapidity),(subtracted_pt+subtracted_mtMinusPt)*cosh(rapidity));
-      subtracted_const.set_user_index(i);
+      subtracted_const.set_user_index(particles[i].user_index());
       subtracted_particles.push_back(subtracted_const);
     }
     fastjet::PseudoJet subtracted_jet=join(subtracted_particles);

@@ -154,13 +154,14 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     if(skipCharged_ && (abs(id) == 1 || abs(id) == 3)) continue;
 
     pfEvt_.pfId_.push_back( id );
-    pfEvt_.pfPt_.push_back( rndSF(pt,4) );
-    pfEvt_.pfEnergy_.push_back( rndSF(energy,4) );
+    pfEvt_.pfPt_.push_back( pt );//rndSF(pt,4) );
+    pfEvt_.pfEnergy_.push_back( energy );//rndSF(energy,4) );
     pfEvt_.pfVsPt_.push_back( rndSF(vsPt,4) );
     pfEvt_.pfVsPtInitial_.push_back( rndSF(vsPtInitial,4) );
     pfEvt_.pfArea_.push_back( rndSF(vsArea,4) );
-    pfEvt_.pfEta_.push_back( rndDP(pfCandidate.eta(),3) );
-    pfEvt_.pfPhi_.push_back( rndDP(pfCandidate.phi(),3) );
+    pfEvt_.pfEta_.push_back( pfCandidate.eta() );//rndDP(pfCandidate.eta(),3) );
+    pfEvt_.pfPhi_.push_back( pfCandidate.phi() );//rndDP(pfCandidate.phi(),3) );
+    pfEvt_.pfM_.push_back( pfCandidate.mass() );
     pfEvt_.nPFpart_++;
 
   }
@@ -249,6 +250,7 @@ void TreePFCandEventData::SetBranches(int etaBins, int fourierOrder, bool doUEra
 
   tree_->Branch("pfEta",&(this->pfEta_));
   tree_->Branch("pfPhi",&(this->pfPhi_));
+  tree_->Branch("pfM",&(this->pfM_));
 
   // -- jet info --
   if(doJets){
@@ -296,6 +298,7 @@ void TreePFCandEventData::Clear()
   pfPhi_.clear();
   genPhi_.clear();
   jetPhi_.clear();
+  pfM_.clear();
   pfVsPt_.clear();
   pfVsPtInitial_.clear();
   pfVsPtEqualized_.clear();

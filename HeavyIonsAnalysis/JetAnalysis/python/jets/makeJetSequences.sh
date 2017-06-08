@@ -11,7 +11,7 @@ do
         do
             for sub in Vs Pu Cs NONE
             do
-                for groom in SoftDrop Filter NONE
+                for groom in SoftDrop SoftDropZ05B15 Filter NONE
                 do
                     for radius in 1 2 3 4 5 6
                     do
@@ -41,7 +41,8 @@ do
 			    else 
 			        resolveByDist="False"
 			    fi
-			    genjets="HiGenJets"
+			    genjets="HiSignalGenJets"
+                            #was: "HiGenJets"
                             ismc="False"
                             corrlabel="_offline"
                             domatch="True"
@@ -52,6 +53,8 @@ do
 			    doTower="True"
 			    doSubJets="False"
                             doGenSubJets="False"
+                            doGenSym="False"
+                            doGenTaus="False"
                             match=""
                             eventinfotag="generator"
 			    jetcorrectionlevels="\'L2Relative\',\'L3Absolute\'"
@@ -72,6 +75,9 @@ do
 
                             if [ $sample == "mc" ] || [ $sample == "jec" ] || [ $sample == "mb" ]; then
                                 ismc="True"
+                                if ( [ $object == "PF" ] ) && ( [ $sub == "Cs" ] || [ $system == "pp" ] ) ; then
+                                  doGenTaus="True"
+                                fi
                             fi
 
                             if [ $system == "pp" ]; then
@@ -85,10 +91,12 @@ do
 			        corrname=`echo ${algo} | sed 's/\(.*\)/\U\1/'`${radius}${object}${corrlabel}
 			    fi
                             
-			    if [ $groom == "SoftDrop" ] || [ $groom == "Filter" ]; then
+			    if [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ] || [ $groom == "Filter" ]; then
 			        doSubJets="True"
-                                if [ $sample == "mc" ] && [ $groom == "SoftDrop" ]; then
+                                doGenTaus="False"
+                                if [ $sample == "mc" ] && [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ]; then
                                     doGenSubJets="True"
+                                    doGenSym="True"
                                 fi
 			    fi
 
@@ -114,7 +122,9 @@ do
 			              -e "s/JETCORRECTIONLEVELS/$jetcorrectionlevels/g" \
 			              -e "s/DOTOWERS_/$doTower/g" \
 			              -e "s/DOSUBJETS_/$doSubJets/g" \
+                                      -e "s/DOGENTAUS_/$doGenTaus/g" \
                                       -e "s/DOGENSUBJETS_/$doGenSubJets/g" \
+                                      -e "s/DOGENSYM_/$doGenSym/g" \
 			              -e "s/RESOLVEBYDIST_/$resolveByDist/g" \
 				      > $algo$subt$groomt$radius${object}JetSequence_${system}_${sample}_cff.py
 
@@ -122,6 +132,11 @@ do
 			    if [ $sample == "jec" ]; then
                                 echo "${algo}${subt}${groomt}${radius}${object}JetAnalyzer.genPtMin = cms.untracked.double(1)" >> $algo$subt$groomt$radius${object}JetSequence_${system}_${sample}_cff.py
 			        echo "${algo}${subt}${groomt}${radius}${object}JetAnalyzer.jetPtMin = cms.double(1)" >> $algo$subt$groomt$radius${object}JetSequence_${system}_${sample}_cff.py
+                            fi
+                            
+                            if [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ] ; then
+                                echo "${algo}${subt}${groomt}${radius}${object}patJetsWithBtagging.userData.userFloats.src += ['${algo}${subt}${groomt}${radius}${object}Jets:sym']" >> $algo$subt$groomt$radius${object}JetSequence_${system}_${sample}_cff.py
+                                echo "${algo}${subt}${groomt}${radius}${object}patJetsWithBtagging.userData.userInts.src += ['${algo}${subt}${groomt}${radius}${object}Jets:droppedBranches']" >> $algo$subt$groomt$radius${object}JetSequence_${system}_${sample}_cff.py
                             fi
                         done
                     done

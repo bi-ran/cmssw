@@ -9,18 +9,21 @@ do
 	fi	
         for algo in ak
         do
-            for sub in Vs Pu Cs NONE
+            for sub in Pu Cs NONE
             do
-                for groom in SoftDrop SoftDropZ05B15 Filter NONE
+                for groom in SoftDrop SoftDropZ05B15 NONE
                 do
-                    for radius in 1 2 3 4 5 6
+                    for radius in 2 3 4
                     do
                         for object in PF Calo
                         do
 			    # no Cs Calo or pp jets
 			    if ( [ $object == "Calo" ] || [ $system == "pp" ] ) && ( [ $sub == "Cs" ] ) ; then
 			        continue
-			    fi
+                            fi
+                            if ( [ $object == "Calo" ] ) &&  ( [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ] ) ; then
+                                continue
+                            fi
                             subt=$sub
                             if [ $sub == "NONE" ]; then
                                 subt=""
@@ -96,7 +99,7 @@ do
 			    if [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ] || [ $groom == "Filter" ]; then
 			        doSubJets="True"
                                 doGenTaus="False"
-                                if [ $sample == "mc" ] && [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ]; then
+                                if [ $sample == "mc" ] && ( [ $groom == "SoftDrop" ] || [ $groom == "SoftDropZ05B15" ] ); then
                                     doGenSubJets="True"
                                     doGenSym="True"
                                 fi

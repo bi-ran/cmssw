@@ -42,7 +42,9 @@ do
 			        resolveByDist="False"
 			    fi
 			    genjets="HiSignalGenJets"
-                            #was: "HiGenJets"
+                            if [ $sample == "mb" ]; then 
+                                 genjets="HiGenJets"
+                            fi
                             ismc="False"
                             corrlabel="_offline"
                             domatch="True"
@@ -75,7 +77,7 @@ do
 
                             if [ $sample == "mc" ] || [ $sample == "jec" ] || [ $sample == "mb" ]; then
                                 ismc="True"
-                                if ( [ $object == "PF" ] ) && ( [ $sub == "Cs" ] || [ $system == "pp" ] ) ; then
+                                if ( [ $object == "PF" ] ) && ( [ $sub == "Cs" ] || [ $system == "pp" ] ) && ( [ $sample != "mb" ] ) ; then
                                   doGenTaus="True"
                                 fi
                             fi

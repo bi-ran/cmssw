@@ -199,7 +199,13 @@ ALGO_SUB_GROOM_RADIUS_OBJECT_JetAnalyzer = inclusiveJetAnalyzer.clone(jetTag = c
 							     doSubJets = cms.untracked.bool(DOSUBJETS_),
                                                              doGenSubJets = cms.untracked.bool(DOGENSUBJETS_),     
                                                              subjetGenTag = cms.untracked.InputTag("ALGO_GROOM_RADIUS_GenJets"),
-                                                             doGenTaus = ISMC
+                                                             doGenTaus = cms.untracked.bool(DOGENTAUS_),
+                                                             genTau1 = cms.InputTag("ALGO_GROOM_RADIUS_GenNjettiness","tau1"),
+                                                             genTau2 = cms.InputTag("ALGO_GROOM_RADIUS_GenNjettiness","tau2"),
+                                                             genTau3 = cms.InputTag("ALGO_GROOM_RADIUS_GenNjettiness","tau3"),
+                                                             doGenSym = cms.untracked.bool(DOGENSYM_),
+                                                             genSym = cms.InputTag("ALGO_GROOM_RADIUS_GenJets","sym"),
+                                                             genDroppedBranches = cms.InputTag("ALGO_GROOM_RADIUS_GenJets","droppedBranches")
                                                              )
 
 ALGO_SUB_GROOM_RADIUS_OBJECT_JetSequence_mc = cms.Sequence(

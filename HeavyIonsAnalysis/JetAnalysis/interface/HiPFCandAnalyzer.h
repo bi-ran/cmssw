@@ -64,6 +64,7 @@ public:
   std::vector<Float_t>         pfPt_, genPt_,  jetPt_;
   std::vector<Float_t>         pfEta_, genEta_,  jetEta_;
   std::vector<Float_t>         pfPhi_, genPhi_,  jetPhi_;
+  std::vector<Float_t>         pfM_;
   std::vector<Float_t>         pfVsPt_;
   std::vector<Float_t>         pfVsPtInitial_;
   std::vector<Float_t>         pfVsPtEqualized_;

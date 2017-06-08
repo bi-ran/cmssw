@@ -33,8 +33,17 @@ process.source = cms.Source("PoolSource",
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10))
+    input = cms.untracked.int32(1))
 
+process.output = cms.OutputModule("PoolOutputModule",
+                                  outputCommands = cms.untracked.vstring('drop *',
+                                                                         'keep *_particleFlow_*_*',
+                                                                         'keep *_particleFlowTmp_*_*',
+                                                                         'keep *_mapEtaEdges_*_*',
+                                                                         'keep *_*_*_HiForest'),
+                                  fileName       = cms.untracked.string ("Output.root")
+)
+#process.outpath  = cms.EndPath(process.output)
 
 #####################################################################################
 # Load Global Tag, Geometry, etc.
@@ -76,9 +85,9 @@ process.TFileService = cms.Service("TFileService",
 #############################
 
 #require the pu algo to use a certain threshold of towers for bg subtraction
-#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedDataPbPb")
+process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedDataPbPb")
 #or don't do that
-process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puUnlimitedDataPbPb")
+#process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puUnlimitedDataPbPb")
 
 #####################################################################################
 

@@ -80,7 +80,6 @@ process.load('HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pp_data_cff'
 
 process.load('HeavyIonsAnalysis.JetAnalysis.jets.ak3PFJetSequence_pp_data_cff')
 process.load('HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pp_data_cff')
-process.load('HeavyIonsAnalysis.JetAnalysis.jets.ak5PFJetSequence_pp_data_cff')
 
 process.highPurityTracks = cms.EDFilter("TrackSelector",
                                         src = cms.InputTag("generalTracks"),
@@ -91,12 +90,10 @@ process.highPurityTracks = cms.EDFilter("TrackSelector",
 
 process.jetSequences = cms.Sequence(
     process.ak3PFJets +
-    process.ak5PFJets +
     process.highPurityTracks +
     process.ak4CaloJetSequence +
     process.ak3PFJetSequence +
-    process.ak4PFJetSequence +
-    process.ak5PFJetSequence
+    process.ak4PFJetSequence
     )
 
 # How to turn on the jet constituents 

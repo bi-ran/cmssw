@@ -52,6 +52,7 @@ HiPFCandAnalyzer::HiPFCandAnalyzer(const edm::ParameterSet& iConfig)
   pfCandidatePF_ = consumes<reco::PFCandidateCollection> (pfCandidateLabel_);
   pfCandidateView_ = consumes<reco::CandidateView> (pfCandidateLabel_);
   pfPtMin_ = iConfig.getParameter<double>("pfPtMin");
+  pfAbsEtaMax_ = iConfig.getUntrackedParameter<double>("pfAbsEtaMax", 5.1);
   genPtMin_ = iConfig.getParameter<double>("genPtMin");
   jetPtMin_ = iConfig.getParameter<double>("jetPtMin");
 
@@ -147,8 +148,10 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
 
     double pt =  pfCandidate.pt();
+    double eta =  pfCandidate.eta();
     double energy = pfCandidate.energy();
     if(pt<=pfPtMin_) continue;
+    if(TMath::Abs(eta) > pfAbsEtaMax_) continue;
 
     int id = pfCandidate.particleId();
     if(skipCharged_ && (abs(id) == 1 || abs(id) == 3)) continue;

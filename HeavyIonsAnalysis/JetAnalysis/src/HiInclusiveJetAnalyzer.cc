@@ -118,6 +118,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   rParam = iConfig.getParameter<double>("rParam");
   hardPtMin_ = iConfig.getUntrackedParameter<double>("hardPtMin",4);
   jetPtMin_ = iConfig.getParameter<double>("jetPtMin");
+  jetAbsEtaMax_ = iConfig.getUntrackedParameter<double>("jetAbsEtaMax", 5.1);
 
   if(isMC_){
     //genjetTag_ = consumes<vector<reco::GenJet> > (iConfig.getParameter<InputTag>("genjetTag"));
@@ -1032,6 +1033,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
     const reco::Jet& jet = (*jets)[j];
 
     if(jet.pt() < jetPtMin_) continue;
+    if(TMath::Abs(jet.eta()) > jetAbsEtaMax_) continue;
     if (useJEC_ && usePat_){
       jets_.rawpt[jets_.nref]=(*patjets)[j].correctedJet("Uncorrected").pt();
     }

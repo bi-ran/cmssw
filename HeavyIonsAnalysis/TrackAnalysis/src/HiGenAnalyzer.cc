@@ -322,6 +322,7 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       nparticles++;
       if ((*it)->momentum().perp()<ptMin_) continue;
       //	if((*it)->status() == 1){
+      if (fabs((*it)->momentum().eta())>etaMax_) continue; 
       Int_t pdg_id = (*it)->pdg_id();
       Float_t eta = (*it)->momentum().eta();
       Float_t phi = (*it)->momentum().phi();
@@ -357,6 +358,7 @@ HiGenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       const reco::GenParticle& p = (*parts)[i];
       if (stableOnly_ && p.status()!=1) continue;
       if (p.pt()<ptMin_) continue;
+      if (fabs(p.eta())>etaMax_) continue;
       if (chargedOnly_&&p.charge()==0) continue;
       hev_.pt.push_back( p.pt());
       hev_.eta.push_back( p.eta());

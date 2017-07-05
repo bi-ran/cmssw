@@ -189,7 +189,7 @@ HiFJGridEmptyAreaCalculator::calculateGridRho(const edm::Event& iEvent, const ed
    //use ony the particles within the eta range
    if (pfCandidate.eta() < ymin_ || pfCandidate.eta() >= ymax_ ) continue;
    int jeta = tileIndexEta(&pfCandidate);
-   if(jeta<0) std::cout << "ymin_: " << ymin_ << " ymax_: " << ymax_ << " eta pf candidates: " << pfCandidate.eta() << std::endl;
+   //if(jeta<0) std::cout << "ymin_: " << ymin_ << " ymax_: " << ymax_ << " eta pf candidates: " << pfCandidate.eta() << std::endl;
    int jphi = tileIndexPhi(&pfCandidate);
    scalarPt[jeta][jphi] += pfCandidate.pt();
   }

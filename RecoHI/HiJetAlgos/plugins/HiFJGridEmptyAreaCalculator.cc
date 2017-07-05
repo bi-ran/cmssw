@@ -189,7 +189,6 @@ HiFJGridEmptyAreaCalculator::calculateGridRho(const edm::Event& iEvent, const ed
    //use ony the particles within the eta range
    if (pfCandidate.eta() < ymin_ || pfCandidate.eta() >= ymax_ ) continue;
    int jeta = tileIndexEta(&pfCandidate);
-   //if(jeta<0) std::cout << "ymin_: " << ymin_ << " ymax_: " << ymax_ << " eta pf candidates: " << pfCandidate.eta() << std::endl;
    int jphi = tileIndexPhi(&pfCandidate);
    scalarPt[jeta][jphi] += pfCandidate.pt();
   }
@@ -372,10 +371,8 @@ HiFJGridEmptyAreaCalculator::tileIndexEta(const reco::PFCandidate *pfCand)  {
   // speed-critical step. It's not at all clear why.
   int iy = int(floor( (pfCand->eta() - ymin_) / dy_ ));
   //if (iy < 0 || iy >= ny_) return -1;
-  if (iy < 0 || iy >= ny_) {
-    std::cout << "iy: " << iy << " ny_: " << ny_ << " dy_: " << dy_ << " eta pf cand: " << pfCand->eta() << std::endl;
+  if (iy < 0 || iy >= ny_) 
     return -1;
-  }
   
   assert (iy < ny_ && iy >= 0);
 

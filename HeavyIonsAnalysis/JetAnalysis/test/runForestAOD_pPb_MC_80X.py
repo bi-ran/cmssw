@@ -88,6 +88,9 @@ process.TFileService = cms.Service("TFileService",
 #############################
 # Jets
 #############################
+# full gen jets followed by filters to select signal-only genjets
+process.load('HeavyIonsAnalysis.JetAnalysis.GenJetSequence')
+process.load('HeavyIonsAnalysis.JetAnalysis.hiSignalGenFilters')
 
 #Pu v2 settings with minimum tower threshold
 process.load("HeavyIonsAnalysis.JetAnalysis.FullJetSequence_puLimitedpPb")
@@ -206,18 +209,22 @@ process.ana_step = cms.Path(process.hltanalysis *
 			    process.hltobject *
                             process.centralityBin *
 			    process.hiEvtAnalyzer *
-                            process.HiGenParticleAna*
+                            process.HiGenParticleAna +
+                            process.akHiGenJets +
+                            process.hiSignalGenFilters +
+                            process.ak2GenNjettiness +
+                            process.ak3GenNjettiness +
+                            process.ak4GenNjettiness +
                             process.jetSequences +
                             process.egmGsfElectronIDSequence + #Should be added in the path for VID module
                             process.ggHiNtuplizer +
                             process.ggHiNtuplizerGED +
                             process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
-			    process.hltMuTree +
                             process.HiForest +
 			    process.trackSequencesPP +
-                            process.runAnalyzer +
-                            process.rechitanalyzer
+                            process.runAnalyzer #+
+                            #process.rechitanalyzer
 )
 
 #####################################################################################

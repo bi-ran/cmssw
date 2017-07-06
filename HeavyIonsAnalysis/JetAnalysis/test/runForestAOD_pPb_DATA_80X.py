@@ -33,8 +33,17 @@ process.source = cms.Source("PoolSource",
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1))
+    input = cms.untracked.int32(10))
 
+process.output = cms.OutputModule("PoolOutputModule",
+                                  outputCommands = cms.untracked.vstring('drop *',
+                                                                         'keep *_particleFlow_*_*',
+                                                                         'keep *_particleFlowTmp_*_*',
+                                                                         'keep *_mapEtaEdges_*_*',
+                                                                         'keep *_*_*_HiForest'),
+                                  fileName       = cms.untracked.string ("OutputMC.root")
+)
+#process.outpath  = cms.EndPath(process.output)
 
 #####################################################################################
 # Load Global Tag, Geometry, etc.
@@ -201,11 +210,9 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.ggHiNtuplizerGED +
                             process.hiFJRhoAnalyzer +
 			    process.pfcandAnalyzer +
-			    process.hltMuTree +
                             process.HiForest +
-			    process.trackSequencesPP +
-                            process.runAnalyzer + 
-                            process.rechitanalyzer
+			    process.trackSequencesPP# +
+                            #process.rechitanalyzer
 )
 
 #####################################################################################

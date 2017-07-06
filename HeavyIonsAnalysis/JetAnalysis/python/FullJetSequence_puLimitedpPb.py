@@ -1,69 +1,67 @@
 import FWCore.ParameterSet.Config as cms
 
-from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.HiReRecoJets_pPb_cff import PFTowers, kt4PFJets, hiFJRhoProducer, hiFJGridEmptyAreaCalculator, akPu2CaloJets, akPu2PFJets, akCs2PFJets, akPu3CaloJets, akPu3PFJets, akCs3PFJets, akPu4CaloJets, akPu4PFJets, akCs4PFJets, akCsSoftDrop4PFJets, akCsSoftDropZ05B154PFJets, akSoftDrop4PFJets, akSoftDropZ05B154PFJets, ak2PFJets, ak3PFJets, ak4PFJets, ak2CaloJets, ak3CaloJets, ak4CaloJets
 
+#jet analyzers
 from HeavyIonsAnalysis.JetAnalysis.jets.ak3PFJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4PFJetSequence_pPb_jec_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pp_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu3PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4PFJetSequence_pPb_jec_cff import *
 from HeavyIonsAnalysis.JetAnalysis.jets.ak4CaloJetSequence_pPb_jec_cff import *
-from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pp_jec_cff import *
-#from HeavyIonsAnalysis.JetAnalysis.jets.akCs4PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akPu4CaloJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akCs3PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akCs4PFJetSequence_pPb_jec_cff import *
 
-from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets
-from RecoHI.HiJetAlgos.hiFJRhoProducer import hiFJRhoProducer
-from RecoHI.HiJetAlgos.hiFJGridEmptyAreaCalculator_cff import hiFJGridEmptyAreaCalculator
-kt4PFJets.src = cms.InputTag('particleFlow')
-kt4PFJets.doAreaFastjet = True
-kt4PFJets.jetPtMin      = cms.double(0.0)
-kt4PFJets.GhostArea     = cms.double(0.005)
-kt2PFJets = kt4PFJets.clone(rParam       = cms.double(0.2))
+#softdrop analyzers
+from HeavyIonsAnalysis.JetAnalysis.jets.akSoftDrop4PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akSoftDropZ05B154PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akCsSoftDrop4PFJetSequence_pPb_jec_cff import *
+from HeavyIonsAnalysis.JetAnalysis.jets.akCsSoftDropZ05B154PFJetSequence_pPb_jec_cff import *
 
-ak4PFJetAnalyzer.doSubEvent = True
-ak4CaloJetAnalyzer.doSubEvent = True
-
-from RecoJets.JetProducers.ak5GenJets_cfi import ak5GenJets
-ak5GenJets = ak5GenJets
-ak4GenJets = ak5GenJets.clone(rParam = 0.4, src = cms.InputTag("genParticlesForJetsNoNu"))
-from RecoJets.Configuration.GenJetParticles_cff import *
-ak3GenJets = ak5GenJets.clone(rParam = 0.3, src = cms.InputTag("genParticlesForJetsNoNu"))
-from RecoJets.Configuration.GenJetParticles_cff import *
-
-akGenJets = cms.Sequence(
-    genParticlesForJetsNoNu +
-    ak4GenJets +
-    ak3GenJets
-)
-
-from HeavyIonsAnalysis.JetAnalysis.makePartons_cff import *
 highPurityTracks = cms.EDFilter("TrackSelector",
                                 src = cms.InputTag("generalTracks"),
                                 cut = cms.string('quality("highPurity")')
 )
 
-#custom for 80X
-PFTowers.src = cms.InputTag("particleFlow")
-
-akPu4PFJetsNoLimits = akPu4PFJets.clone(
-    minimumTowersFraction = cms.double(0.)
-)
-
+#the following lines are in the wrong python config
+#they should be in a python config handling reco, not analyzers. To be fixed
+akPu2PFJets.minimumTowersFraction = cms.double(0.5)
+akPu3PFJets.minimumTowersFraction = cms.double(0.5)
 akPu4PFJets.minimumTowersFraction = cms.double(0.5)
 akPu4CaloJets.minimumTowersFraction = cms.double(0.)
 
+#left commented by Marta since I don't know why we are turning this on here
+#ak4PFJetAnalyzer.doSubEvent = True
+#ak4CaloJetAnalyzer.doSubEvent = True
+
 jetSequences = cms.Sequence(
-    akGenJets +
-#    ppReRecoPFJets +
-#    ppReRecoCaloJets +
-    #kt2PFJets +
-    #kt4PFJets +
-    hiReRecoCaloJets +
     PFTowers +
-    hiReRecoPFJets +
-    makePartons +
+    kt4PFJets +
+    hiFJRhoProducer +
+    hiFJGridEmptyAreaCalculator +
+    ak3PFJets +
+    ak4PFJets +
+    akPu3PFJets +
+    akPu4PFJets +
+    ak4CaloJets +
+    akPu4CaloJets +
+    akCs3PFJets +
+    akCs4PFJets +
+    akSoftDrop4PFJets +
+    akSoftDropZ05B154PFJets +
+    akCsSoftDrop4PFJets +
+    akCsSoftDropZ05B154PFJets +
     highPurityTracks +
     ak3PFJetSequence +
     ak4PFJetSequence +
+    akPu3PFJetSequence +
     akPu4PFJetSequence +
     ak4CaloJetSequence +
-    akPu4CaloJetSequence
+    akPu4CaloJetSequence +
+    akCs3PFJetSequence +
+    akCs4PFJetSequence +
+    akSoftDrop4PFJetSequence +
+    akSoftDropZ05B154PFJetSequence +
+    akCsSoftDrop4PFJetSequence +
+    akCsSoftDropZ05B154PFJetSequence
 )

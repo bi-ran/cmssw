@@ -196,15 +196,39 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    vector<float>  phoEt_;
    vector<float>  phoEta_;
    vector<float>  phoPhi_;
+
    vector<float>  phoSCE_;
    vector<float>  phoSCRawE_;
-   vector<float>  phoESEn_;
    vector<float>  phoSCEta_;
    vector<float>  phoSCPhi_;
    vector<float>  phoSCEtaWidth_;
    vector<float>  phoSCPhiWidth_;
    vector<float>  phoSCBrem_;
-   vector<int>    phohasPixelSeed_;
+   vector<int>    phoSCnHits_;
+   vector<uint32_t> phoSCflags_;
+   vector<int>    phoSCinClean_;
+   vector<int>    phoSCinUnClean_;
+   vector<int>    phoSCnBC_;
+   vector<float>  phoESEn_;
+
+   vector<float>  phoPSCE_;
+   vector<float>  phoPSCRawE_;
+   vector<float>  phoPSCEta_;
+   vector<float>  phoPSCPhi_;
+   vector<float>  phoPSCEtaWidth_;
+   vector<float>  phoPSCPhiWidth_;
+   vector<float>  phoPSCBrem_;
+   vector<int>    phoPSCnHits_;
+   vector<uint32_t> phoPSCflags_;
+   vector<int>    phoPSCinClean_;
+   vector<int>    phoPSCinUnClean_;
+   vector<int>    phoPSCnBC_;
+   vector<float>  phoPESEn_;
+
+   vector<int>    phoIsPFPhoton_;
+   vector<int>    phoIsStandardPhoton_;
+   vector<int>    phoHasPixelSeed_;
+   vector<int>    phoHasConversionTracks_;
 // vector<int>    phoEleVeto_;         // TODO: not available in reco::
    vector<float>  phoR9_;
    vector<float>  phoHadTowerOverEm_;
@@ -212,30 +236,37 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    vector<float>  phoSigmaIEtaIEta_;
 // vector<float>  phoSigmaIEtaIPhi_;   // TODO: not available in reco::
 // vector<float>  phoSigmaIPhiIPhi_;   // TODO: not available in reco::
-   vector<float>  phoE1x3_;
-   vector<float>  phoE2x2_;
-   vector<float>  phoE3x3_;
-   vector<float>  phoE2x5Max_;
    vector<float>  phoE1x5_;
    vector<float>  phoE2x5_;
+   vector<float>  phoE3x3_;
    vector<float>  phoE5x5_;
    vector<float>  phoMaxEnergyXtal_;
    vector<float>  phoSigmaEtaEta_;
    vector<float>  phoR1x5_;
    vector<float>  phoR2x5_;
-   vector<float>  phoESEffSigmaRR_;
+   vector<float>  phoR9_2012_;
    vector<float>  phoSigmaIEtaIEta_2012_;
-   vector<float>  phoSigmaIEtaIPhi_2012_;
-   vector<float>  phoSigmaIPhiIPhi_2012_;
-   vector<float>  phoE1x3_2012_;
-   vector<float>  phoE2x2_2012_;
+   vector<float>  phoE1x5_2012_;
+   vector<float>  phoE2x5_2012_;
    vector<float>  phoE3x3_2012_;
-   vector<float>  phoE2x5Max_2012_;
    vector<float>  phoE5x5_2012_;
+   vector<float>  phoMaxEnergyXtal_2012_;
+   vector<float>  phoSigmaEtaEta_2012_;
+   vector<float>  phoR1x5_2012_;
+   vector<float>  phoR2x5_2012_;
    vector<float>  phoBC1E_;
+   vector<float>  phoBC1Ecorr_;
    vector<float>  phoBC1Eta_;
+   vector<float>  phoBC1Phi_;
+   vector<int>    phoBC1size_;
+   vector<uint32_t> phoBC1flags_;
+   vector<int>    phoBC1inClean_;
+   vector<int>    phoBC1inUnClean_;
+   vector<uint32_t> phoBC1rawID_;
+
    vector<float>  phoBC2E_;
    vector<float>  phoBC2Eta_;
+   vector<float>  phoBC2Phi_;
    vector<float>  pho_ecalClusterIsoR2_;
    vector<float>  pho_ecalClusterIsoR3_;
    vector<float>  pho_ecalClusterIsoR4_;

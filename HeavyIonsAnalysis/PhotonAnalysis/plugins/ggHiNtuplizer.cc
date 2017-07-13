@@ -180,15 +180,39 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
   tree_->Branch("phoEt",                 &phoEt_);
   tree_->Branch("phoEta",                &phoEta_);
   tree_->Branch("phoPhi",                &phoPhi_);
+
   tree_->Branch("phoSCE",                &phoSCE_);
   tree_->Branch("phoSCRawE",             &phoSCRawE_);
-  tree_->Branch("phoESEn",               &phoESEn_);
   tree_->Branch("phoSCEta",              &phoSCEta_);
   tree_->Branch("phoSCPhi",              &phoSCPhi_);
   tree_->Branch("phoSCEtaWidth",         &phoSCEtaWidth_);
   tree_->Branch("phoSCPhiWidth",         &phoSCPhiWidth_);
   tree_->Branch("phoSCBrem",             &phoSCBrem_);
-  tree_->Branch("phohasPixelSeed",       &phohasPixelSeed_);
+  tree_->Branch("phoSCnHits",            &phoSCnHits_);
+  tree_->Branch("phoSCflags",            &phoSCflags_);
+  tree_->Branch("phoSCinClean",          &phoSCinClean_);
+  tree_->Branch("phoSCinUnClean",        &phoSCinUnClean_);
+  tree_->Branch("phoSCnBC",              &phoSCnBC_);
+  tree_->Branch("phoESEn",               &phoESEn_);
+
+  tree_->Branch("phoPSCE",               &phoPSCE_);
+  tree_->Branch("phoPSCRawE",            &phoPSCRawE_);
+  tree_->Branch("phoPSCEta",             &phoPSCEta_);
+  tree_->Branch("phoPSCPhi",             &phoPSCPhi_);
+  tree_->Branch("phoPSCEtaWidth",        &phoPSCEtaWidth_);
+  tree_->Branch("phoPSCPhiWidth",        &phoPSCPhiWidth_);
+  tree_->Branch("phoPSCBrem",            &phoPSCBrem_);
+  tree_->Branch("phoPSCnHits",           &phoPSCnHits_);
+  tree_->Branch("phoPSCflags",           &phoPSCflags_);
+  tree_->Branch("phoPSCinClean",         &phoPSCinClean_);
+  tree_->Branch("phoPSCinUnClean",       &phoPSCinUnClean_);
+  tree_->Branch("phoPSCnBC",             &phoPSCnBC_);
+  tree_->Branch("phoPESEn",              &phoPESEn_);
+
+  tree_->Branch("phoIsPFPhoton",         &phoIsPFPhoton_);
+  tree_->Branch("phoIsStandardPhoton",   &phoIsStandardPhoton_);
+  tree_->Branch("phoHasPixelSeed",       &phoHasPixelSeed_);
+  tree_->Branch("phoHasConversionTracks",&phoHasConversionTracks_);
 // tree_->Branch("phoEleVeto",            &phoEleVeto_);        // TODO: not available in reco::
   tree_->Branch("phoR9",                 &phoR9_);
   tree_->Branch("phoHadTowerOverEm",     &phoHadTowerOverEm_);
@@ -196,30 +220,39 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
   tree_->Branch("phoSigmaIEtaIEta",      &phoSigmaIEtaIEta_);
 // tree_->Branch("phoSigmaIEtaIPhi",      &phoSigmaIEtaIPhi_);  // TODO: not available in reco::
 // tree_->Branch("phoSigmaIPhiIPhi",      &phoSigmaIPhiIPhi_);  // TODO: not available in reco::
-  tree_->Branch("phoE1x3",               &phoE1x3_);
-  tree_->Branch("phoE2x2",               &phoE2x2_);
-  tree_->Branch("phoE3x3",               &phoE3x3_);
-  tree_->Branch("phoE2x5Max",            &phoE2x5Max_);
   tree_->Branch("phoE1x5",               &phoE1x5_);
   tree_->Branch("phoE2x5",               &phoE2x5_);
+  tree_->Branch("phoE3x3",               &phoE3x3_);
   tree_->Branch("phoE5x5",               &phoE5x5_);
   tree_->Branch("phoMaxEnergyXtal",      &phoMaxEnergyXtal_);
   tree_->Branch("phoSigmaEtaEta",        &phoSigmaEtaEta_);
   tree_->Branch("phoR1x5",               &phoR1x5_);
   tree_->Branch("phoR2x5",               &phoR2x5_);
-  tree_->Branch("phoESEffSigmaRR",       &phoESEffSigmaRR_);
+  tree_->Branch("phoR9_2012",            &phoR9_2012_);
   tree_->Branch("phoSigmaIEtaIEta_2012", &phoSigmaIEtaIEta_2012_);
-  tree_->Branch("phoSigmaIEtaIPhi_2012", &phoSigmaIEtaIPhi_2012_);
-  tree_->Branch("phoSigmaIPhiIPhi_2012", &phoSigmaIPhiIPhi_2012_);
-  tree_->Branch("phoE1x3_2012",          &phoE1x3_2012_);
-  tree_->Branch("phoE2x2_2012",          &phoE2x2_2012_);
+  tree_->Branch("phoE1x5_2012",          &phoE1x5_2012_);
+  tree_->Branch("phoE2x5_2012",          &phoE2x5_2012_);
   tree_->Branch("phoE3x3_2012",          &phoE3x3_2012_);
-  tree_->Branch("phoE2x5Max_2012",       &phoE2x5Max_2012_);
   tree_->Branch("phoE5x5_2012",          &phoE5x5_2012_);
+  tree_->Branch("phoMaxEnergyXtal_2012", &phoMaxEnergyXtal_2012_);
+  tree_->Branch("phoSigmaEtaEta_2012",   &phoSigmaEtaEta_2012_);
+  tree_->Branch("phoR1x5_2012",          &phoR1x5_2012_);
+  tree_->Branch("phoR2x5_2012",          &phoR2x5_2012_);
+
   tree_->Branch("phoBC1E",               &phoBC1E_);
+  tree_->Branch("phoBC1Ecorr",           &phoBC1Ecorr_);
   tree_->Branch("phoBC1Eta",             &phoBC1Eta_);
+  tree_->Branch("phoBC1Phi",             &phoBC1Phi_);
+  tree_->Branch("phoBC1size",            &phoBC1size_);
+  tree_->Branch("phoBC1flags",           &phoBC1flags_);
+  tree_->Branch("phoBC1inClean",         &phoBC1inClean_);
+  tree_->Branch("phoBC1inUnClean",       &phoBC1inUnClean_);
+  tree_->Branch("phoBC1rawID",           &phoBC1rawID_);
+
   tree_->Branch("phoBC2E",               &phoBC2E_);
   tree_->Branch("phoBC2Eta",             &phoBC2Eta_);
+  tree_->Branch("phoBC2Phi",             &phoBC2Phi_);
+
   tree_->Branch("pho_ecalClusterIsoR2", &pho_ecalClusterIsoR2_);
   tree_->Branch("pho_ecalClusterIsoR3", &pho_ecalClusterIsoR3_);
   tree_->Branch("pho_ecalClusterIsoR4", &pho_ecalClusterIsoR4_);
@@ -503,15 +536,39 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   phoEt_                .clear();
   phoEta_               .clear();
   phoPhi_               .clear();
+
   phoSCE_               .clear();
   phoSCRawE_            .clear();
-  phoESEn_              .clear();
   phoSCEta_             .clear();
   phoSCPhi_             .clear();
   phoSCEtaWidth_        .clear();
   phoSCPhiWidth_        .clear();
   phoSCBrem_            .clear();
-  phohasPixelSeed_      .clear();
+  phoSCnHits_           .clear();
+  phoSCflags_           .clear();
+  phoSCinClean_         .clear();
+  phoSCinUnClean_       .clear();
+  phoSCnBC_             .clear();
+  phoESEn_              .clear();
+
+  phoPSCE_              .clear();
+  phoPSCRawE_           .clear();
+  phoPSCEta_            .clear();
+  phoPSCPhi_            .clear();
+  phoPSCEtaWidth_       .clear();
+  phoPSCPhiWidth_       .clear();
+  phoPSCBrem_           .clear();
+  phoPSCnHits_          .clear();
+  phoPSCflags_          .clear();
+  phoPSCinClean_        .clear();
+  phoPSCinUnClean_      .clear();
+  phoPSCnBC_            .clear();
+  phoPESEn_             .clear();
+
+  phoIsPFPhoton_        .clear();
+  phoIsStandardPhoton_  .clear();
+  phoHasPixelSeed_      .clear();
+  phoHasConversionTracks_.clear();
 // phoEleVeto_           .clear();  // TODO: not available in reco::
   phoR9_                .clear();
   phoHadTowerOverEm_    .clear();
@@ -519,30 +576,38 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   phoSigmaIEtaIEta_     .clear();
 // phoSigmaIEtaIPhi_     .clear();  // TODO: not available in reco::
 // phoSigmaIPhiIPhi_     .clear();  // TODO: not available in reco::
-  phoE1x3_              .clear();
-  phoE2x2_              .clear();
-  phoE3x3_              .clear();
-  phoE2x5Max_           .clear();
   phoE1x5_              .clear();
   phoE2x5_              .clear();
+  phoE3x3_              .clear();
   phoE5x5_              .clear();
   phoMaxEnergyXtal_     .clear();
   phoSigmaEtaEta_       .clear();
   phoR1x5_              .clear();
   phoR2x5_              .clear();
-  phoESEffSigmaRR_      .clear();
+  phoR9_2012_           .clear();
   phoSigmaIEtaIEta_2012_.clear();
-  phoSigmaIEtaIPhi_2012_.clear();
-  phoSigmaIPhiIPhi_2012_.clear();
-  phoE1x3_2012_         .clear();
-  phoE2x2_2012_         .clear();
+  phoE1x5_2012_         .clear();
+  phoE2x5_2012_         .clear();
   phoE3x3_2012_         .clear();
-  phoE2x5Max_2012_      .clear();
   phoE5x5_2012_         .clear();
+  phoMaxEnergyXtal_2012_.clear();
+  phoSigmaEtaEta_2012_  .clear();
+  phoR1x5_2012_         .clear();
+  phoR2x5_2012_         .clear();
+
   phoBC1E_              .clear();
+  phoBC1Ecorr_          .clear();
   phoBC1Eta_            .clear();
+  phoBC1Phi_            .clear();
+  phoBC1size_           .clear();
+  phoBC1flags_          .clear();
+  phoBC1inClean_        .clear();
+  phoBC1inUnClean_      .clear();
+  phoBC1rawID_          .clear();
+
   phoBC2E_              .clear();
   phoBC2Eta_            .clear();
+  phoBC2Phi_            .clear();
   pho_ecalClusterIsoR2_.clear();
   pho_ecalClusterIsoR3_.clear();
   pho_ecalClusterIsoR4_.clear();
@@ -1106,16 +1171,42 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
     phoEt_            .push_back(pho->et());
     phoEta_           .push_back(pho->eta());
     phoPhi_           .push_back(pho->phi());
+    // SuperCluster info
     phoSCE_           .push_back(pho->superCluster()->energy());
     phoSCRawE_        .push_back(pho->superCluster()->rawEnergy());
-    phoESEn_          .push_back(pho->superCluster()->preshowerEnergy());
     phoSCEta_         .push_back(pho->superCluster()->eta());
     phoSCPhi_         .push_back(pho->superCluster()->phi());
     phoSCEtaWidth_    .push_back(pho->superCluster()->etaWidth());
     phoSCPhiWidth_    .push_back(pho->superCluster()->phiWidth());
     phoSCBrem_        .push_back(pho->superCluster()->phiWidth()/pho->superCluster()->etaWidth());
-    phohasPixelSeed_  .push_back((int)pho->hasPixelSeed());
-//    phoEleVeto_       .push_back((int)pho->passElectronVeto());   // TODO: not available in reco::
+    phoSCnHits_       .push_back(pho->superCluster()->size());
+    phoSCflags_       .push_back(pho->superCluster()->flags());
+    phoSCinClean_     .push_back((int)pho->superCluster()->isInClean());
+    phoSCinUnClean_   .push_back((int)pho->superCluster()->isInUnclean());
+    phoSCnBC_         .push_back((int)pho->superCluster()->clustersSize());
+    phoESEn_          .push_back(pho->superCluster()->preshowerEnergy());
+    // PF SuperCluster info
+    if (pho->parentSuperCluster().isAvailable() && pho->parentSuperCluster().isNonnull()) {
+        phoPSCE_           .push_back(pho->parentSuperCluster()->energy());
+        phoPSCRawE_        .push_back(pho->parentSuperCluster()->rawEnergy());
+        phoPSCEta_         .push_back(pho->parentSuperCluster()->eta());
+        phoPSCPhi_         .push_back(pho->parentSuperCluster()->phi());
+        phoPSCEtaWidth_    .push_back(pho->parentSuperCluster()->etaWidth());
+        phoPSCPhiWidth_    .push_back(pho->parentSuperCluster()->phiWidth());
+        phoPSCBrem_        .push_back(pho->parentSuperCluster()->phiWidth()/pho->parentSuperCluster()->etaWidth());
+        phoPSCnHits_       .push_back(pho->parentSuperCluster()->size());
+        phoPSCflags_       .push_back(pho->parentSuperCluster()->flags());
+        phoPSCinClean_     .push_back((int)pho->parentSuperCluster()->isInClean());
+        phoPSCinUnClean_   .push_back((int)pho->parentSuperCluster()->isInUnclean());
+        phoPSCnBC_         .push_back((int)pho->parentSuperCluster()->clustersSize());
+        phoPESEn_          .push_back(pho->parentSuperCluster()->preshowerEnergy());
+    }
+
+    phoIsPFPhoton_    .push_back((int)pho->isPFlowPhoton());
+    phoIsStandardPhoton_.push_back((int)pho->isStandardPhoton());
+    phoHasPixelSeed_  .push_back((int)pho->hasPixelSeed());
+    phoHasConversionTracks_.push_back((int)pho->hasConversionTracks());
+    // phoEleVeto_       .push_back((int)pho->passElectronVeto());   // TODO: not available in reco::
     phoR9_            .push_back(pho->r9());
     phoHadTowerOverEm_.push_back(pho->hadTowOverEm());
     phoHoverE_        .push_back(pho->hadronicOverEm());
@@ -1124,36 +1215,39 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
     //phoSigmaIPhiIPhi_ .push_back(pho->spp());   // TODO: not available in reco::
 
     // additional shower shape variables
-    phoE3x3_   .push_back(pho->e3x3());
     phoE1x5_   .push_back(pho->e1x5());
     phoE2x5_   .push_back(pho->e2x5());
+    phoE3x3_   .push_back(pho->e3x3());
     phoE5x5_   .push_back(pho->e5x5());
     phoMaxEnergyXtal_.push_back(pho->maxEnergyXtal());
     phoSigmaEtaEta_.push_back(pho->sigmaEtaEta());
     phoR1x5_.push_back(pho->r1x5());
     phoR2x5_.push_back(pho->r2x5());
 
-    // phoE1x3_          .push_back(lazyTool.e1x3(      *(pho->superCluster()->seed())));
-    // phoE2x2_          .push_back(lazyTool.e2x2(      *(pho->superCluster()->seed())));
-    // phoE2x5Max_       .push_back(lazyTool.e2x5Max(   *(pho->superCluster()->seed())));
-    // phoESEffSigmaRR_  .push_back(lazyTool.eseffsirir(*(pho->superCluster())));
-
     // full 5x5
-    // vector<float> vCov = lazyTool_noZS.localCovariances(*(pho->superCluster()->seed()));
-    // phoSigmaIEtaIEta_2012_ .push_back(isnan(vCov[0]) ? 0. : sqrt(vCov[0]));
-    // phoSigmaIEtaIPhi_2012_ .push_back(vCov[1]);
-    // phoSigmaIPhiIPhi_2012_ .push_back(isnan(vCov[2]) ? 0. : sqrt(vCov[2]));
-    phoSigmaIEtaIEta_2012_.push_back(pho->full5x5_sigmaIetaIeta() );
-
+    phoR9_2012_           .push_back(pho->full5x5_r9());
+    phoSigmaIEtaIEta_2012_.push_back(pho->full5x5_sigmaIetaIeta());
+    phoE1x5_2012_.push_back(pho->full5x5_e1x5());
+    phoE2x5_2012_.push_back(pho->full5x5_e2x5());
     phoE3x3_2012_.push_back(pho->full5x5_e3x3());
-    // phoE1x3_2012_          .push_back(lazyTool_noZS.e1x3(   *(pho->superCluster()->seed())));
-    // phoE2x2_2012_          .push_back(lazyTool_noZS.e2x2(   *(pho->superCluster()->seed())));
-    // phoE2x5Max_2012_       .push_back(lazyTool_noZS.e2x5Max(*(pho->superCluster()->seed())));
-    // phoE5x5_2012_          .push_back(lazyTool_noZS.e5x5(   *(pho->superCluster()->seed())));
+    phoE5x5_2012_.push_back(pho->full5x5_e5x5());
+    phoMaxEnergyXtal_2012_.push_back(pho->full5x5_maxEnergyXtal());
+    phoSigmaEtaEta_2012_.push_back(pho->full5x5_sigmaEtaEta());
+    phoR1x5_2012_.push_back(pho->full5x5_r1x5());
+    phoR2x5_2012_.push_back(pho->full5x5_r2x5());
 
-    // seed
-    // phoBC1E_     .push_back(pho->superCluster()->seed()->energy());
-    // phoBC1Eta_   .push_back(pho->superCluster()->seed()->eta());
+    // seed BC
+    if (pho->superCluster()->seed().isAvailable() && pho->parentSuperCluster().isNonnull()) {
+        phoBC1E_        .push_back(pho->superCluster()->seed()->energy());
+        phoBC1Ecorr_    .push_back(pho->superCluster()->seed()->correctedEnergy());
+        phoBC1Eta_      .push_back(pho->superCluster()->seed()->eta());
+        phoBC1Phi_      .push_back(pho->superCluster()->seed()->phi());
+        phoBC1size_     .push_back(pho->superCluster()->seed()->size());
+        phoBC1flags_    .push_back(pho->superCluster()->seed()->flags());
+        phoBC1inClean_  .push_back(pho->superCluster()->seed()->isInClean());
+        phoBC1inUnClean_.push_back(pho->superCluster()->seed()->isInUnclean());
+        phoBC1rawID_    .push_back(pho->superCluster()->seed()->seed().rawId());
+    }
 
     // parameters of the very first PFCluster
     // reco::CaloCluster_iterator bc = pho->superCluster()->clustersBegin();

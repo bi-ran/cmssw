@@ -1237,7 +1237,7 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
     phoR2x5_2012_.push_back(pho->full5x5_r2x5());
 
     // seed BC
-    if (pho->superCluster()->seed().isAvailable() && pho->parentSuperCluster().isNonnull()) {
+    if (pho->superCluster()->seed().isAvailable() && pho->superCluster()->seed().isNonnull()) {
         phoBC1E_        .push_back(pho->superCluster()->seed()->energy());
         phoBC1Ecorr_    .push_back(pho->superCluster()->seed()->correctedEnergy());
         phoBC1Eta_      .push_back(pho->superCluster()->seed()->eta());

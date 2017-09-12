@@ -72,9 +72,6 @@
 #include "CalibFormats/HcalObjects/interface/HcalDbRecord.h"
 #include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
 
-#include "DataFormats/HeavyIonEvent/interface/VoronoiBackground.h"
-#include "RecoHI/HiJetAlgos/interface/UEParameters.h"
-
 
 #include "TNtuple.h"
 
@@ -208,7 +205,6 @@ private:
   edm::Handle<std::vector<double> > rhos;
   edm::Handle<std::vector<double> > sigmas;
 
-  edm::Handle<reco::VoronoiMap> backgrounds_;
   edm::Handle<std::vector<float> > vn_;
 
   MyRecHit hbheRecHit;
@@ -274,12 +270,6 @@ private:
   edm::EDGetTokenT<std::vector<double>> FastJetTag_rhos_;
   edm::EDGetTokenT<std::vector<double>> FastJetTag_sigmas_;
 
-  edm::EDGetTokenT<reco::VoronoiMap> srcVor_backgrounds_;
-  edm::EDGetTokenT<std::vector<float>> srcVor_vn_;
-  int           fourierOrder_;
-  int           etaBins_;
-  bool   doUEraw_;
-
 
   bool useJets_;
   bool doBasicClusters_;
@@ -290,8 +280,6 @@ private:
   bool doCastor_;
   bool doZDCRecHit_;
   bool doZDCDigi_;
-
-  bool doVS_;
 
   bool hasVtx_;
   bool saveBothVtx_;
@@ -340,15 +328,6 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doCastor_ = iConfig.getUntrackedParameter<bool>("doCASTOR",true);
   doZDCRecHit_ = iConfig.getUntrackedParameter<bool>("doZDCRecHit",true);
   doZDCDigi_ = iConfig.getUntrackedParameter<bool>("doZDCDigi",true);
-  doVS_ = iConfig.getUntrackedParameter<bool>("doVS",true);
-
-  doUEraw_ = iConfig.getUntrackedParameter<bool>("doUEraw",0);
-
-  etaBins_ = iConfig.getParameter<int>("etaBins");
-  fourierOrder_ = iConfig.getParameter<int>("fourierOrder");
-
-  srcVor_backgrounds_ = consumes<reco::VoronoiMap> (iConfig.getParameter<edm::InputTag>("bkg"));
-  srcVor_vn_ = consumes<std::vector<float>> (iConfig.getParameter<edm::InputTag>("bkg"));
 
   hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",true);
   saveBothVtx_ = iConfig.getUntrackedParameter<bool>("saveBothVtx",false);
@@ -422,28 +401,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
   if(doTowers_){
     ev.getByToken(TowerSrc_,towers);
-
-  }
-
-  if (doTowers_ && doVS_) {
-    ev.getByToken(TowerSrc_Candidates_,candidates_);
-    ev.getByToken(srcVor_backgrounds_,backgrounds_);
-    ev.getByToken(srcVor_vn_,vn_);
-
-    UEParameters vnUE(vn_.product(),fourierOrder_,etaBins_);
-    const std::vector<float>& vue = vnUE.get_raw();
-    for(int ieta = 0; ieta < etaBins_; ++ieta){
-      myTowers.sumpt[ieta] = vnUE.get_sum_pt(ieta);
-      for(int ifour = 0; ifour < fourierOrder_; ++ifour){
-	myTowers.vn[ifour * etaBins_ + ieta] = vnUE.get_vn(ifour,ieta);
-	myTowers.psin[ifour * etaBins_ + ieta] = vnUE.get_psin(ifour,ieta);
-      }
-    }
-
-
-    for(int iue = 0; iue < etaBins_*fourierOrder_*2*3; ++iue){
-      myTowers.ueraw[iue] = vue[iue];
-    }
 
   }
 
@@ -673,20 +630,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       const CaloTower & hit= (*towers)[i];
       if (getEt(hit.id(),hit.energy())<towerPtMin_) continue;
 
-      if (doVS_) {
-
-	reco::CandidateViewRef ref(candidates_,i);
-	double vsPtInitial=-999, vsPt=-999, vsArea = -999;
-
-	const reco::VoronoiBackground& voronoi = (*backgrounds_)[ref];
-	vsPt = voronoi.pt();
-	vsPtInitial = voronoi.pt_subtracted();
-	vsArea = voronoi.area();
-	myTowers.vsPt[myTowers.n] = vsPt;
-	myTowers.vsPtInitial[myTowers.n] = vsPtInitial;
-	myTowers.vsArea[myTowers.n] = vsArea;
-
-      }
       const CaloTowerDetId & id = hit.id();
       myTowers.rawId[myTowers.n] = id.rawId();
       myTowers.ieta[myTowers.n] = id.ieta();
@@ -991,20 +934,6 @@ RecHitTreeProducer::beginJob()
     towerTree->Branch("rawId",myTowers.rawId,"rawId[n]/I");
     towerTree->Branch("ieta",myTowers.ieta,"ieta[n]/I");
     towerTree->Branch("iphi",myTowers.iphi,"iphi[n]/I");
-
-    if(doVS_){
-
-      towerTree->Branch("vsPt",myTowers.vsPt,"vsPt[n]/F");
-      towerTree->Branch("vsPtInitial",myTowers.vsPtInitial,"vsPtInitial[n]/F");
-      towerTree->Branch("vsArea",myTowers.vsArea,"vsArea[n]/F");
-
-      towerTree->Branch("vn",myTowers.vn,Form("vn[%d][%d]/F",fourierOrder_,etaBins_));
-      towerTree->Branch("psin",myTowers.psin,Form("vpsi[%d][%d]/F",fourierOrder_,etaBins_));
-      towerTree->Branch("sumpt",myTowers.sumpt,Form("sumpt[%d]/F",etaBins_));
-      if(doUEraw_){
-	towerTree->Branch("ueraw",myTowers.ueraw,Form("ueraw[%d]/F",(fourierOrder_*etaBins_*2*3)));
-      }
-    }
 
 
   }

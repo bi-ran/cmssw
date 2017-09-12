@@ -117,16 +117,6 @@ struct MyRecHit{
   float jtpt;
   float jteta;
   float jtphi;
-
-  Float_t                vsPt[MAXHITS];
-  Float_t                vsPtInitial[MAXHITS];
-  Float_t                vsArea[MAXHITS];
-
-  Float_t                 sumpt[20];
-  Float_t                 vn[200];
-  Float_t                 psin[200];
-  Float_t                 ueraw[1200];
-
 };
 
 

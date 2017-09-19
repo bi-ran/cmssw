@@ -1201,6 +1201,21 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
         phoPSCnBC_         .push_back((int)pho->parentSuperCluster()->clustersSize());
         phoPESEn_          .push_back(pho->parentSuperCluster()->preshowerEnergy());
     }
+    else {
+        phoPSCE_           .push_back(-999);
+        phoPSCRawE_        .push_back(-999);
+        phoPSCEta_         .push_back(-999);
+        phoPSCPhi_         .push_back(-999);
+        phoPSCEtaWidth_    .push_back(-999);
+        phoPSCPhiWidth_    .push_back(-999);
+        phoPSCBrem_        .push_back(-999);
+        phoPSCnHits_       .push_back(-999);
+        phoPSCflags_       .push_back(-999);
+        phoPSCinClean_     .push_back(-999);
+        phoPSCinUnClean_   .push_back(-999);
+        phoPSCnBC_         .push_back(-999);
+        phoPESEn_          .push_back(-999);
+    }
 
     phoIsPFPhoton_    .push_back((int)pho->isPFlowPhoton());
     phoIsStandardPhoton_.push_back((int)pho->isStandardPhoton());
@@ -1247,6 +1262,17 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
         phoBC1inClean_  .push_back(pho->superCluster()->seed()->isInClean());
         phoBC1inUnClean_.push_back(pho->superCluster()->seed()->isInUnclean());
         phoBC1rawID_    .push_back(pho->superCluster()->seed()->seed().rawId());
+    }
+    else {
+        phoBC1E_        .push_back(-999);
+        phoBC1Ecorr_    .push_back(-999);
+        phoBC1Eta_      .push_back(-999);
+        phoBC1Phi_      .push_back(-999);
+        phoBC1size_     .push_back(-999);
+        phoBC1flags_    .push_back(-999);
+        phoBC1inClean_  .push_back(-999);
+        phoBC1inUnClean_.push_back(-999);
+        phoBC1rawID_    .push_back(0);
     }
 
     // parameters of the very first PFCluster

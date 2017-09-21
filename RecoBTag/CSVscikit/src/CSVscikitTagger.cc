@@ -134,6 +134,8 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 	
 	int jetntracks = vars.getList(reco::btau::trackSip2dSig,false).size();
 
+	float vtxMassVal = 0.;
+
 	for(auto &mva_var : variables_){
 		//vectorial tagging variable
 		if(mva_var.has_index){
@@ -176,6 +178,11 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 			////std::cout << " varSV[" << mva_var.name << "]";
 			
 			if (mva_var.name == "TagVarCSV_jetNTracks") inputs[mva_var.name] = jetntracks;
+			
+			//IK: vtxMass check to check vtxType: vtxType = 2 (no vtx), vtxMass < 0, vtxType = 1 (pseudo vtx), vtxMass > 0
+                        if(mva_var.name == "TagVarCSV_vertexMass"){
+                          vtxMassVal = inputs[mva_var.name];
+                        }
 
 			if (passes_cuts) {
 			  //if (mva_var.name == "TagVarCSV_jetNTracks") std::cout << save_pt_value << "\t" << save_eta_value << "\t" << inputs[mva_var.name] << "\t";
@@ -186,12 +193,17 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 			}
 			
 			//if (mva_var.name == "TagVarCSV_jetNTracks" && inputs[mva_var.name] < 0) notTaggable = true;
-			if (mva_var.name == "TagVarCSV_jetNTracks" && inputs[mva_var.name] < 2) notTaggable = true;
+			//if (mva_var.name == "TagVarCSV_jetNTracks" && inputs[mva_var.name] < 2) notTaggable = true;
 			//!!!!!!!
 			//if (mva_var.name == "TagVarCSV_jetNTracks") inputs[mva_var.name] = 4;
 		}
 		
 	}
+
+	//IK: if no reco vtx (including pseudo vtx) and no tracks passing all selections (including K0s veto) -> jet is not taggable
+        if(vtxMassVal < 0 && jetntracks == 0) {
+          notTaggable = true;
+        }
 
 	//get the MVA output
 	float tag = (mvaID_->evaluate(inputs)+1)/2.;

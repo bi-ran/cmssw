@@ -37,12 +37,6 @@ CSVscikitTagger::CSVscikitTagger(const edm::ParameterSet & configuration):
 		mva_var.id = reco::getTaggingVariableName(
 			var.getParameter<std::string>("taggingVarName")
 			);
-		//if (mva_var.id == btau::lastTaggingVariable) {
-		//if (mva_var.id == 1) {
-		
-		//}
-		
-		
 		
 		mva_var.has_index = var.existsAs<int>("idx") ;
 		mva_var.index = mva_var.has_index ? var.getParameter<int>("idx") : 0;
@@ -58,12 +52,6 @@ CSVscikitTagger::CSVscikitTagger(const edm::ParameterSet & configuration):
 
 	uses(0, "akPu4PFImpactParameterTagInfos");
 	uses(1, "akPu4PFSecondaryVertexTagInfos");
-
-	//uses(0, "pfImpactParameterTagInfos");
-	//uses(1, "pfInclusiveSecondaryVertexFinderCvsLTagInfos");
-	//uses(1, "pfInclusiveSecondaryVertexFinderTagInfos");
-	//uses(2, "softPFMuonsTagInfos");
-	//uses(3, "softPFElectronsTagInfos");
 }
 
 void CSVscikitTagger::initialize(const JetTagComputerRecord & record)
@@ -107,21 +95,10 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
   // default value, used if there are no leptons associated to this jet
   const reco::TrackIPTagInfo & ip_info = tagInfo.get<reco::TrackIPTagInfo>(0);
 	const reco::SecondaryVertexTagInfo & sv_info = tagInfo.get<reco::SecondaryVertexTagInfo>(1);
-	//const reco::CandIPTagInfo & ip_info = tagInfo.get<reco::CandIPTagInfo>(0);
-	//  std::cout<<2<<std::endl;
-	//	const reco::CandSecondaryVertexTagInfo & sv_info = tagInfo.get<reco::CandSecondaryVertexTagInfo>(1);
-	//const reco::CandSoftLeptonTagInfo& softmu_info = tagInfo.get<reco::CandSoftLeptonTagInfo>(2);
-	//const reco::CandSoftLeptonTagInfo& softel_info = tagInfo.get<reco::CandSoftLeptonTagInfo>(3);
-	//reco::TaggingVariableList vars = sl_computer_(ip_info, sv_info, softmu_info, softel_info);
 	reco::TaggingVariableList vars = sv_computer_(ip_info, sv_info);
-
-	
-	//for (auto x:vars)
-	//	  std::cout<<x.first<<" - "<<x.second<<std::endl;
 
 	// Loop over input variables
 	std::map<std::string, float> inputs;
-	//std::cout << "jetvars->";
 	
 	//For debugging;
 	float save_pt_value = -1.0;
@@ -141,11 +118,7 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 		if(mva_var.has_index){
 			std::vector<float> vals = vars.getList(mva_var.id, false);
 			inputs[mva_var.name] = (vals.size() > mva_var.index) ? vals[mva_var.index] : mva_var.default_value;
-			////std::cout << " varVV[" << mva_var.name << "]=" << inputs[mva_var.name];
-			
-			////std::cout << " varVV[" << mva_var.name << "]";
-			
-			//at least _0 and _1 should exist
+
 			if (mva_var.name == "TagVarCSV_trackSip3dSig_1" && inputs[mva_var.name] > -99.001 && inputs[mva_var.name] < -98.999) notTaggable = true;
 			
 			if (passes_cuts) {
@@ -153,30 +126,19 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 			}
 
 			if (mva_var.name == "Jet_pt") {
-			  //std::cout << "foundJet_pt ";
 			  save_pt_value = inputs[mva_var.name];
 			}
 
 			if (mva_var.name == "Jet_eta") {
-			  //std::cout << "foundJet_eta ";
 			  save_eta_value = inputs[mva_var.name];
 			  passes_cuts = (save_pt_value > 30 && save_eta_value > -2.4 && save_eta_value < 2.4);
-			  //passes_cuts = true;
-			  
 			  if (printdebug) {if (passes_cuts) std::cout << save_pt_value << "\t" << save_eta_value << "\t";}
 			}
-			
-			
-			
 			
 		}
 		//single value tagging var
 		else {
 			inputs[mva_var.name] = vars.get(mva_var.id, mva_var.default_value);
-			////std::cout << " varSV[" << mva_var.name << "]=" << inputs[mva_var.name];
-			
-			////std::cout << " varSV[" << mva_var.name << "]";
-			
 			if (mva_var.name == "TagVarCSV_jetNTracks") inputs[mva_var.name] = jetntracks;
 			
 			//IK: vtxMass check to check vtxType: vtxType = 2 (no vtx), vtxMass < 0, vtxType = 1 (pseudo vtx), vtxMass > 0
@@ -185,17 +147,8 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
                         }
 
 			if (passes_cuts) {
-			  //if (mva_var.name == "TagVarCSV_jetNTracks") std::cout << save_pt_value << "\t" << save_eta_value << "\t" << inputs[mva_var.name] << "\t";
-			  //else std::cout << inputs[mva_var.name] << "\t";
-			  
 			  if (printdebug) std::cout << inputs[mva_var.name] << "\t";
-			
 			}
-			
-			//if (mva_var.name == "TagVarCSV_jetNTracks" && inputs[mva_var.name] < 0) notTaggable = true;
-			//if (mva_var.name == "TagVarCSV_jetNTracks" && inputs[mva_var.name] < 2) notTaggable = true;
-			//!!!!!!!
-			//if (mva_var.name == "TagVarCSV_jetNTracks") inputs[mva_var.name] = 4;
 		}
 		
 	}
@@ -207,8 +160,6 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 
 	//get the MVA output
 	float tag = (mvaID_->evaluate(inputs)+1)/2.;
-	////std::cout << "---> tag = " << tag << std::endl;
-        //std::cout << tag <<"\n";
 	if (printdebug) {if (passes_cuts) std::cout << tag <<"\n";}
 	
 	if (notTaggable) {
@@ -224,10 +175,5 @@ float CSVscikitTagger::discriminator(const TagInfoHelper & tagInfo) const {
 	  std::cout<<"  ---  Result : "<<tag<<std::endl;
 	}
 	
-	//std::cout <<"\n";
-	
 	return tag;
-
-	//if (notTaggable) return -1.0;
-	//else return tag;
 }

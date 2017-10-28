@@ -26,13 +26,13 @@ process.HiForest.HiForestVersion = cms.string(version)
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(
-                                "root://eoscms.cern.ch//eos/cms/store/cmst3/group/hintt/CMSSW_7_5_8_patch2/TTbar/RECO/Events_1.root"
+                                "/store/user/mnguyen/ppFCR/Pythia6_TuneZ2_5020GeV/Pythia6_bfcr30_TuneZ2_5020GeV_RECO/160306_172029/0000/step3_1.root"
                             )
 )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10))
+    input = cms.untracked.int32(100))
 
 
 #####################################################################################
@@ -59,7 +59,7 @@ process = overrideJEC_pp5020(process)
 #####################################################################################
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName=cms.string("HiForestAOD.root"))
+                                   fileName=cms.string("HiForestAOD_myTagger.root"))
 
 #####################################################################################
 # Additional Reconstruction and Analysis: Main Body
@@ -157,6 +157,18 @@ for idmod in my_id_modules:
 process.load("HeavyIonsAnalysis.VectorBosonAnalysis.tupelSequence_pp_mc_cff")
 
 #####################################################################################
+
+
+####B-TAGGING#####
+
+process.load('RecoBTag.CSVscikit.csvscikitTagJetTags_cfi')
+process.load('RecoBTag.CSVscikit.csvscikitTaggerProducer_cfi')
+
+process.ak4PFCombinedSecondaryVertexV2BJetTags = process.pfCSVscikitJetTags.clone()
+process.ak4PFCombinedSecondaryVertexV2BJetTags.tagInfos=cms.VInputTag(cms.InputTag("ak4PFImpactParameterTagInfos"), cms.InputTag("ak4PFSecondaryVertexTagInfos"))
+process.CSVscikitTags.weightFile=cms.FileInPath('HeavyIonsAnalysis/JetAnalysis/data/TMVA_Btag_pp_BDTG.weights.xml')
+
+################
 
 #########################
 # Main analysis list

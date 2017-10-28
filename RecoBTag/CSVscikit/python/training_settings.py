@@ -1,9 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-csvscikit_vpset = cms.VPSet([cms.PSet(
-    default = cms.double(-0.1),
-    name = cms.string('TagVarCSV_jetNTracks'),
-    taggingVarName = cms.string('jetNTracks')
-), cms.PSet(
+csvscikit_vpset = cms.VPSet([
+cms.PSet(
     default = cms.double(-100),
     idx = cms.int32(0),
     name = cms.string('TagVarCSV_trackSip3dSig_0'),
@@ -179,4 +176,8 @@ csvscikit_vpset = cms.VPSet([cms.PSet(
     default = cms.double(0),
     name = cms.string('TagVarCSV_jetNSecondaryVertices'),
     taggingVarName = cms.string('jetNSecondaryVertices')
+),cms.PSet(
+    default = cms.double(0),
+    name = cms.string('TagVarCSV_vertexCategory'),
+    taggingVarName = cms.string('vertexCategory')
 )])

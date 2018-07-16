@@ -15,6 +15,8 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "DataFormats/EcalRecHit/interface/EcalRecHit.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
@@ -49,6 +51,8 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    bool doPfIso_;
    bool doVsIso_; // also requires above boolean to make sense
    bool doVID_;
+   bool doRecHitsEB_;
+   bool doRecHitsEE_;
 
    // handles to collections of objects
    edm::EDGetTokenT<vector<PileupSummaryInfo> >    genPileupCollection_;
@@ -68,6 +72,11 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    edm::EDGetTokenT<edm::View<reco::PFCandidate> >    pfCollection_;
    edm::EDGetTokenT<edm::ValueMap<reco::VoronoiBackground> > voronoiBkgCalo_;
    edm::EDGetTokenT<edm::ValueMap<reco::VoronoiBackground> > voronoiBkgPF_;
+
+   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEB_;
+   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEE_;
+
+   const CaloGeometry *geo;
 
    EffectiveAreas effectiveAreas_;
 
@@ -284,6 +293,23 @@ class ggHiNtuplizer : public edm::EDAnalyzer {
    vector<float>  pho_swissCrx_;
    vector<float>  pho_seedTime_;
    vector<int>    pho_genMatchedIndex_;
+
+   // rechit info
+   int nRH_;
+   vector<uint32_t> rhRawId_;
+   vector<int> rhieta_;
+   vector<int> rhiphi_;
+   vector<int> rhix_;
+   vector<int> rhiy_;
+   vector<float> rhE_;
+   vector<float> rhEt_;
+   vector<float> rhEta_;
+   vector<float> rhPhi_;
+   vector<float> rhChi2_;
+   vector<float> rhEerror_;
+   vector<uint32_t> rhFlags_;
+   vector<int> rhPhoIdx_;   // index of the photon this rechit belongs to
+   vector<int> rhBCIdx_;    // index of this rechit's BC in the SC
 
    //photon pf isolation stuff
    vector<float> pfcIso1;

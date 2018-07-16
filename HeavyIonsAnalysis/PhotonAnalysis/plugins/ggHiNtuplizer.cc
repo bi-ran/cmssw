@@ -11,6 +11,11 @@
 #include "HeavyIonsAnalysis/PhotonAnalysis/interface/ggHiNtuplizer.h"
 #include "HeavyIonsAnalysis/PhotonAnalysis/interface/GenParticleParentage.h"
 
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/EcalDetId/interface/EBDetId.h"
+#include "DataFormats/EcalDetId/interface/EEDetId.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
 using namespace std;
 
 ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
@@ -24,6 +29,8 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
   useValMapIso_           = ps.getParameter<bool>("useValMapIso");
   doPfIso_                = ps.getParameter<bool>("doPfIso");
   doVsIso_                = ps.getParameter<bool>("doVsIso");
+  doRecHitsEB_            = ps.getParameter<bool>("doRecHitsEB");
+  doRecHitsEE_            = ps.getParameter<bool>("doRecHitsEE");
   genPileupCollection_    = consumes<vector<PileupSummaryInfo> >   (ps.getParameter<edm::InputTag>("pileupCollection"));
   genParticlesCollection_ = consumes<vector<reco::GenParticle> >   (ps.getParameter<edm::InputTag>("genParticleSrc"));
   gsfElectronsCollection_ = consumes<edm::View<reco::GsfElectron> >(ps.getParameter<edm::InputTag>("gsfElectronLabel"));
@@ -42,6 +49,12 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
   }
   if(useValMapIso_){
     recoPhotonsHiIso_ = consumes<edm::ValueMap<reco::HIPhotonIsolation> > (ps.getParameter<edm::InputTag>("recoPhotonHiIsolationMap"));
+  }
+  if(doRecHitsEB_){
+      recHitsEB_ = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (ps.getUntrackedParameter<edm::InputTag>("recHitsEB",edm::InputTag("ecalRecHit","EcalRecHitsEB")));
+  }
+  if(doRecHitsEE_){
+      recHitsEE_ = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (ps.getUntrackedParameter<edm::InputTag>("recHitsEE",edm::InputTag("ecalRecHit","EcalRecHitsEE")));
   }
 
   if(doPfIso_){
@@ -273,6 +286,25 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps):
     tree_->Branch("pho_genMatchedIndex", &pho_genMatchedIndex_);
   }
 
+  if (doRecHitsEB_ || doRecHitsEE_) {
+      // rechit info
+      tree_->Branch("nRH", &nRH_);
+      tree_->Branch("rhRawId", &rhRawId_);
+      tree_->Branch("rhieta", &rhieta_);
+      tree_->Branch("rhiphi", &rhiphi_);
+      tree_->Branch("rhix", &rhix_);
+      tree_->Branch("rhiy", &rhiy_);
+      tree_->Branch("rhE", &rhE_);
+      tree_->Branch("rhEt", &rhEt_);
+      tree_->Branch("rhEta", &rhEta_);
+      tree_->Branch("rhPhi", &rhPhi_);
+      tree_->Branch("rhChi2", &rhChi2_);
+      tree_->Branch("rhEerror", &rhEerror_);
+      tree_->Branch("rhFlags", &rhFlags_);
+      tree_->Branch("rhPhoIdx", &rhPhoIdx_);
+      tree_->Branch("rhBCIdx", &rhBCIdx_);
+  }
+
   if(doPfIso_){
     tree_->Branch("pfcIso1",&pfcIso1);
     tree_->Branch("pfcIso2",&pfcIso2);
@@ -426,6 +458,7 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   nEle_ = 0;
   nPho_ = 0;
   nMu_ = 0;
+  nRH_ = 0;
 
   nPU_                  .clear();
   puBX_                 .clear();
@@ -626,6 +659,22 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
   pho_seedTime_.clear();
   pho_genMatchedIndex_.clear();
 
+  // rechit info
+  rhRawId_.clear();
+  rhieta_.clear();
+  rhiphi_.clear();
+  rhix_.clear();
+  rhiy_.clear();
+  rhE_.clear();
+  rhEt_.clear();
+  rhEta_.clear();
+  rhPhi_.clear();
+  rhChi2_.clear();
+  rhEerror_.clear();
+  rhFlags_.clear();
+  rhPhoIdx_.clear();
+  rhBCIdx_.clear();
+
   //photon pf isolation stuff
   pfcIso1.clear();
   pfcIso2.clear();
@@ -774,6 +823,11 @@ void ggHiNtuplizer::analyze(const edm::Event& e, const edm::EventSetup& es)
       break;
     }
 
+  if (doRecHitsEB_ || doRecHitsEE_) {
+      edm::ESHandle<CaloGeometry> pGeo;
+      es.get<CaloGeometryRecord>().get(pGeo);
+      geo = pGeo.product();
+  }
 
   fillElectrons(e, es, pv);
   fillPhotons(e, es, pv);
@@ -1165,6 +1219,15 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
     isoMap = * recoPhotonHiIsoHandle;
   }
 
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEBHandle;
+  if (doRecHitsEB_) {
+      e.getByToken(recHitsEB_, recHitsEBHandle);
+  }
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEEHandle;
+  if (doRecHitsEE_) {
+      e.getByToken(recHitsEE_, recHitsEEHandle);
+  }
+
   // loop over photons
   for (edm::View<reco::Photon>::const_iterator pho = recoPhotonsHandle->begin(); pho != recoPhotonsHandle->end(); ++pho) {
     phoE_             .push_back(pho->energy());
@@ -1307,6 +1370,74 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
       pho_trackIsoR5PtCut20_.push_back(isoMap[photonRef].trackIsoR5PtCut20());
       pho_swissCrx_.push_back(isoMap[photonRef].swissCrx());
       pho_seedTime_.push_back(isoMap[photonRef].seedTime());
+    }
+
+    if (doRecHitsEB_ || doRecHitsEE_) {
+
+        int iBC = 0;
+        for (reco::CaloCluster_iterator bc = pho->superCluster()->clustersBegin(); bc != pho->superCluster()->clustersEnd(); ++bc) {
+
+            std::vector<std::pair<DetId, float>>::const_iterator hitBC;
+            for (hitBC = (*bc)->hitsAndFractions().begin(); hitBC != (*bc)->hitsAndFractions().end(); ++hitBC) {
+
+                const DetId & rhDetId = (*hitBC).first;
+                edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >* recHitsHandle;
+
+                if (rhDetId.subdetId() == EcalBarrel && doRecHitsEB_) {
+                    recHitsHandle = (&recHitsEBHandle);
+                }
+                else if (rhDetId.subdetId() == EcalEndcap && doRecHitsEE_) {
+                    recHitsHandle = (&recHitsEEHandle);
+                }
+                else continue;
+
+                edm::SortedCollection<EcalRecHit>::const_iterator rhIter = (*recHitsHandle)->find(rhDetId);
+                const EcalRecHit & rh = (*rhIter);
+
+                rhRawId_.push_back(rhDetId.rawId());
+                if (rhDetId.subdetId() == EcalBarrel) {
+                    rhieta_.push_back(EBDetId(rhDetId).ieta());
+                    rhiphi_.push_back(EBDetId(rhDetId).iphi());
+                    rhix_.push_back(-999);
+                    rhiy_.push_back(-999);
+                }
+                else if (rhDetId.subdetId() == EcalEndcap) {
+                    rhieta_.push_back(-999);
+                    rhiphi_.push_back(-999);
+                    rhix_.push_back(EEDetId(rhDetId).ix());
+                    rhiy_.push_back(EEDetId(rhDetId).iy());
+                }
+                else {
+                    rhieta_.push_back(-999);
+                    rhiphi_.push_back(-999);
+                    rhix_.push_back(-999);
+                    rhiy_.push_back(-999);
+                }
+                rhE_.push_back(rh.energy());
+
+                math::XYZPoint posXYZ((geo->getPosition(rhDetId)).x() - pv.x(),
+                                      (geo->getPosition(rhDetId)).y() - pv.y(),
+                                      (geo->getPosition(rhDetId)).z() - pv.z());
+
+                rhEt_.push_back(rh.energy()*sin(posXYZ.theta()));
+                rhEta_.push_back(posXYZ.eta());
+                rhPhi_.push_back(posXYZ.phi());
+                rhChi2_.push_back(rh.chi2());
+                rhEerror_.push_back(rh.energyError());
+
+                uint32_t flagTmp = 0;
+                for (unsigned int iFlag=0; iFlag<32; ++iFlag) {
+                    if (rh.checkFlag(iFlag))
+                        flagTmp |= 1 << iFlag;
+                }
+                rhFlags_.push_back(flagTmp);
+
+                rhPhoIdx_.push_back(nPho_);
+                rhBCIdx_.push_back(iBC);
+                nRH_++;
+            }
+            iBC++;
+        }
     }
 
     if(doPfIso_)

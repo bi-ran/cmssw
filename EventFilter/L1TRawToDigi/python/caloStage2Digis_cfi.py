@@ -6,5 +6,6 @@ caloStage2Digis = cms.EDProducer(
     FedIds          = cms.vint32( 1360, 1366 ),
     FWId            = cms.uint32(0),
     FWOverride      = cms.bool(False),
-    TMTCheck        = cms.bool(True)
+    TMTCheck        = cms.bool(True),
+    InputLabel      = cms.InputTag('rawDataCollector'),
 )

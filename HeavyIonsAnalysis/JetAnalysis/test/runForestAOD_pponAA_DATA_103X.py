@@ -57,6 +57,10 @@ process.GlobalTag.toGet.extend([
         connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS"),
         label = cms.untracked.string("HFtowers")
         ),
+    cms.PSet(record = cms.string('HeavyIonRPRcd'),
+        tag = cms.string('HeavyIonRPRcd_PbPb2018_offline'),
+        connect = cms.string('sqlite_file:HeavyIonRPRcd_PbPb2018_offline.db'),
+        ),
     ])
 
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import overrideJEC_PbPb5020
@@ -65,6 +69,14 @@ process = overrideJEC_PbPb5020(process)
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 process.centralityBin.Centrality = cms.InputTag("hiCentrality")
 process.centralityBin.centralityVariable = cms.string("HFtowers")
+
+process.load('RecoHI.HiEvtPlaneAlgos.HiEvtPlane_cfi')
+process.hiEvtPlane.trackTag = 'generalTracks'
+process.hiEvtPlane.vertexTag = 'offlinePrimaryVertices'
+process.hiEvtPlane.loadDB = True
+process.hiEvtPlane.caloCentRef = -1
+process.hiEvtPlane.caloCentRefWidth = -1
+process.hiEvtPlane.useNtrk = cms.untracked.bool(False)
 
 ###############################################################################
 # Define tree output
@@ -182,6 +194,7 @@ process.ana_step = cms.Path(
     process.hltobject +
     #process.l1object +
     process.centralityBin +
+    process.hiEvtPlane +
     process.hiEvtAnalyzer +
     process.jetSequence +
     process.ggHiNtuplizer +

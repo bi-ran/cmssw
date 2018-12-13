@@ -666,7 +666,6 @@ TrackAnalyzer::fillTracks(const edm::Event& iEvent, const edm::EventSetup& iSetu
     pev_.trkVz[pev_.nTrk]=etrk.vz();
 
     math::XYZPoint v1(pev_.xVtx[pev_.maxPtVtx],pev_.yVtx[pev_.maxPtVtx], pev_.zVtx[pev_.maxPtVtx]);
-    std::cout << it << " " << pev_.nVtx << " " << etrk.dz(v1) << std::endl;
     pev_.trkDz1[pev_.nTrk]=rndSF(etrk.dz(v1),4);
     pev_.trkDzError1[pev_.nTrk]=rndSF(sqrt(etrk.dzError()*etrk.dzError()+pev_.zVtxErr[pev_.maxPtVtx]*pev_.zVtxErr[pev_.maxPtVtx]),4);
     pev_.trkDxy1[pev_.nTrk]=rndSF(etrk.dxy(v1),4);

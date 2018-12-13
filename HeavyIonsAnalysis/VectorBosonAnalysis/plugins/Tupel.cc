@@ -10,58 +10,60 @@
 #include <fstream>
 #include <vector>
 #include <memory>
-#include <TLorentzVector.h>
-#include <stdlib.h>
+
 #include "TH1.h"
 #include "TH2.h"
 #include "TTree.h"
-#include "FWCore/Utilities/interface/TimeOfDay.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/Utilities/interface/InputTag.h"
-#include "FWCore/Version/interface/GetReleaseVersion.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "TLorentzVector.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/Math/interface/deltaR.h"
-#include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-#include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"
-#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
-#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Photon.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
-#include "DataFormats/BeamSpot/interface/BeamSpot.h"
-#include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"
+#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
+#include "EgammaAnalysis/ElectronTools/interface/PFIsolationEstimator.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/GenericHandle.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-//#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/Utilities/interface/TimeOfDay.h"
+#include "FWCore/Version/interface/GetReleaseVersion.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
-//#include "CMGTools/External/interface/PileupJetIdentifier.h"
-#include "EgammaAnalysis/ElectronTools/interface/PFIsolationEstimator.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "DataFormats/BTauReco/interface/JetTag.h"
+#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+//#include "CMGTools/External/interface/PileupJetIdentifier.h"
+//#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 #include "TreeHelper.h"
 
@@ -535,12 +537,12 @@ private:
   unsigned kHLT_HIL2Mu15_;
 
   ///Event objects
-  edm::Handle<GenParticleCollection> genParticles_h;
-  const GenParticleCollection* genParticles;
+  edm::Handle<reco::GenParticleCollection> genParticles_h;
+  const reco::GenParticleCollection* genParticles;
   edm::Handle<edm::View<pat::Muon> > muons;
   const edm::View<pat::Muon> * muon;
-  edm::Handle<vector<pat::Electron> > electrons;
-  const vector<pat::Electron>  *electron;
+  edm::Handle<std::vector<pat::Electron> > electrons;
+  const std::vector<pat::Electron>  *electron;
   edm::Handle<reco::ConversionCollection> conversions_h;
   edm::Handle<edm::View<pat::Tau> > taus;
   edm::Handle<edm::View<pat::Jet> > jets;
@@ -782,7 +784,7 @@ void Tupel::readEvent(const edm::Event& iEvent){
 
   // edm::Handle<reco::GsfElectronCollection> els_h;
   // iEvent.getByLabel("gsfElectrons", els_h);
-  iEvent.getByLabel(InputTag("reducedEgamma","reducedConversions"), conversions_h);
+  iEvent.getByLabel(edm::InputTag("reducedEgamma","reducedConversions"), conversions_h);
 
   // get tau collection
   iEvent.getByLabel(tauSrc_,taus);
@@ -826,7 +828,7 @@ void Tupel::readEvent(const edm::Event& iEvent){
 
 void Tupel::processMET(const edm::Event& iEvent){
   for(unsigned int imet=0;imet<metSources.size();imet++){
-    Handle<View<pat::MET> > metH;
+    edm::Handle<edm::View<pat::MET> > metH;
     iEvent.getByLabel(metSources[imet], metH);
     if(!metH.isValid())continue;
     //cout<<"MET"<<imet<<"  "<<metSources[imet]<<"  "<<metH->ptrAt(0)->pt()<<endl;
@@ -865,7 +867,7 @@ void Tupel::processVtx(){
 }
 
 void Tupel::processPu(const edm::Event& iEvent){
-  Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+  edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
   iEvent.getByLabel("addPileupInfo", PupInfo);
   if(!PupInfo.failedToGet()){
     std::vector<PileupSummaryInfo>::const_iterator PVI;
@@ -1036,7 +1038,7 @@ void Tupel::processGenParticles(const edm::Event& iEvent){
 
 void Tupel::processGenJets(const edm::Event& iEvent){
   //matrix element info
-  Handle<LHEEventProduct> lheH;
+  edm::Handle<LHEEventProduct> lheH;
   iEvent.getByLabel(lheSource_,lheH);//to be modularized!!!
   if(lheH.isValid()) *GNup_ = lheH->hepeup().NUP;
   if(!genjetColl_.failedToGet()){

@@ -46,7 +46,8 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load('FWCore.MessageService.MessageLogger_cfi')
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '75X_mcRun2_asymptotic_ppAt5TeV_v3', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v14', '')
+# process.GlobalTag = GlobalTag(process.GlobalTag, '75X_mcRun2_asymptotic_ppAt5TeV_v3', '')
 process.HiForest.GlobalTagLabel = process.GlobalTag.globaltag
 
 

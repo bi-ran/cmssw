@@ -14,7 +14,8 @@ process.options = cms.untracked.PSet()
 process.load("HeavyIonsAnalysis.JetAnalysis.HiForest_cff")
 process.HiForest.inputLines = cms.vstring("HiForest V3",)
 import subprocess
-version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"], stdout=subprocess.PIPE, shell=True).stdout.read()
+version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"],
+    stdout=subprocess.PIPE, shell=True).stdout.read()
 if version == '':
     version = 'no git info'
 process.HiForest.HiForestVersion = cms.string(version)
@@ -24,10 +25,10 @@ process.HiForest.HiForestVersion = cms.string(version)
 #####################################################################################
 
 process.source = cms.Source("PoolSource",
-                            duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-                            fileNames = cms.untracked.vstring(
-                                "/store/user/mnguyen/ppFCR/Pythia6_TuneZ2_5020GeV/Pythia6_bfcr30_TuneZ2_5020GeV_RECO/160306_172029/0000/step3_1.root"
-                            )
+    duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
+    fileNames = cms.untracked.vstring(
+	"/store/user/mnguyen/ppFCR/Pythia6_TuneZ2_5020GeV/Pythia6_bfcr30_TuneZ2_5020GeV_RECO/160306_172029/0000/step3_1.root"
+	)
 )
 
 # Number of events we want to process, -1 = all events
@@ -128,8 +129,9 @@ process.ggHiNtuplizer.VtxLabel           = cms.InputTag("offlinePrimaryVertices"
 process.ggHiNtuplizer.particleFlowCollection = cms.InputTag("particleFlow")
 process.ggHiNtuplizer.doVsIso            = cms.bool(False)
 process.ggHiNtuplizer.doElectronVID      = cms.bool(True)
-process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(recoPhotonSrc = cms.InputTag('gedPhotons'),
-                                                       recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerppGED'))
+process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(
+    recoPhotonSrc = cms.InputTag('gedPhotons'),
+    recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerppGED'))
 
 ####################################################################################
 #####################
@@ -166,7 +168,9 @@ process.load('RecoBTag.CSVscikit.csvscikitTagJetTags_cfi')
 process.load('RecoBTag.CSVscikit.csvscikitTaggerProducer_cfi')
 
 process.ak4PFCombinedSecondaryVertexV2BJetTags = process.pfCSVscikitJetTags.clone()
-process.ak4PFCombinedSecondaryVertexV2BJetTags.tagInfos=cms.VInputTag(cms.InputTag("ak4PFImpactParameterTagInfos"), cms.InputTag("ak4PFSecondaryVertexTagInfos"))
+process.ak4PFCombinedSecondaryVertexV2BJetTags.tagInfos = cms.VInputTag(
+    cms.InputTag("ak4PFImpactParameterTagInfos"),
+    cms.InputTag("ak4PFSecondaryVertexTagInfos"))
 process.CSVscikitTags.weightFile=cms.FileInPath('HeavyIonsAnalysis/JetAnalysis/data/TMVA_Btag_pp_BDTG.weights.xml')
 
 ################

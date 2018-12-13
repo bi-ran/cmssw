@@ -14,7 +14,8 @@ process.options = cms.untracked.PSet()
 process.load("HeavyIonsAnalysis.JetAnalysis.HiForest_cff")
 process.HiForest.inputLines = cms.vstring("HiForest V3",)
 import subprocess
-version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"], stdout=subprocess.PIPE, shell=True).stdout.read()
+version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"],
+    stdout=subprocess.PIPE, shell=True).stdout.read()
 if version == '':
     version = 'no git info'
 process.HiForest.HiForestVersion = cms.string(version)
@@ -24,10 +25,10 @@ process.HiForest.HiForestVersion = cms.string(version)
 #####################################################################################
 
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring(
-                                '/store/data/Run2015E/HighPtJet80/AOD/PromptReco-v1/000/262/173/00000/3E8293B5-9894-E511-90E8-02163E011FA1.root'                        
-                                #'/store/data/Run2015E/HighPtJet80/AOD/PromptReco-v1/000/262/272/00000/803A4255-7696-E511-B178-02163E0142DD.root'
-                            )
+	fileNames = cms.untracked.vstring(
+	    '/store/data/Run2015E/HighPtJet80/AOD/PromptReco-v1/000/262/173/00000/3E8293B5-9894-E511-90E8-02163E011FA1.root'
+	    #'/store/data/Run2015E/HighPtJet80/AOD/PromptReco-v1/000/262/272/00000/803A4255-7696-E511-B178-02163E0142DD.root'
+	    )
 )
 
 # Number of events we want to process, -1 = all events
@@ -146,8 +147,9 @@ process.ggHiNtuplizer.particleFlowCollection = cms.InputTag("particleFlow")
 process.ggHiNtuplizer.doVsIso   = cms.bool(False)
 process.ggHiNtuplizer.doGenParticles = False
 process.ggHiNtuplizer.doElectronVID = cms.bool(True)
-process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(recoPhotonSrc = cms.InputTag('gedPhotons'),
-                                                       recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerppGED'))
+process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(
+    recoPhotonSrc = cms.InputTag('gedPhotons'),
+    recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerppGED'))
 
 ####################################################################################
 

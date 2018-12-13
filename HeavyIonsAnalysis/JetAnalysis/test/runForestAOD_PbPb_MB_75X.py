@@ -14,7 +14,8 @@ process.options = cms.untracked.PSet()
 process.load("HeavyIonsAnalysis.JetAnalysis.HiForest_cff")
 process.HiForest.inputLines = cms.vstring("HiForest V3",)
 import subprocess
-version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"], stdout=subprocess.PIPE, shell=True).stdout.read()
+version = subprocess.Popen(["(cd $CMSSW_BASE/src && git describe --tags)"],
+    stdout=subprocess.PIPE, shell=True).stdout.read()
 if version == '':
     version = 'no git info'
 process.HiForest.HiForestVersion = cms.string(version)
@@ -24,11 +25,11 @@ process.HiForest.HiForestVersion = cms.string(version)
 #####################################################################################
 
 process.source = cms.Source("PoolSource",
-                            duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-                            fileNames = cms.untracked.vstring(
-                                "file:samples/PbPb_MC_RECODEBUG.root"
-                                )
-                            )
+    duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
+    fileNames = cms.untracked.vstring(
+        "file:samples/PbPb_MC_RECODEBUG.root"
+        )
+    )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
@@ -48,7 +49,8 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_HeavyIon_v14', '')
-# process.GlobalTag = GlobalTag(process.GlobalTag, '75X_mcRun2_HeavyIon_v13', '') #for now track GT manually, since centrality tables updated ex post facto
+# for now track GT manually, since centrality tables updated ex post facto
+# process.GlobalTag = GlobalTag(process.GlobalTag, '75X_mcRun2_HeavyIon_v13', '')
 process.HiForest.GlobalTagLabel = process.GlobalTag.globaltag
 
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import overrideJEC_PbPb5020
@@ -136,8 +138,9 @@ process.load('HeavyIonsAnalysis.JetAnalysis.TrkAnalyzers_cff')
 #####################
 
 process.load('HeavyIonsAnalysis.PhotonAnalysis.ggHiNtuplizer_cfi')
-process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(recoPhotonSrc = cms.InputTag('gedPhotonsTmp'),
-                                                       recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerGED')
+process.ggHiNtuplizerGED = process.ggHiNtuplizer.clone(
+    recoPhotonSrc = cms.InputTag('gedPhotonsTmp'),
+    recoPhotonHiIsolationMap = cms.InputTag('photonIsolationHIProducerGED')
 )
 
 #####################################################################################
@@ -155,13 +158,19 @@ process.load("HeavyIonsAnalysis.VectorBosonAnalysis.tupelSequence_PbPb_mc_cff")
 process.load('RecoBTag.CSVscikit.csvscikitTagJetTags_cfi')
 process.load('RecoBTag.CSVscikit.csvscikitTaggerProducer_cfi')
 process.akPu4PFCombinedSecondaryVertexV2BJetTags = process.pfCSVscikitJetTags.clone()
-process.akPu4PFCombinedSecondaryVertexV2BJetTags.tagInfos=cms.VInputTag(cms.InputTag("akPu4PFImpactParameterTagInfos"), cms.InputTag("akPu4PFSecondaryVertexTagInfos"))
+process.akPu4PFCombinedSecondaryVertexV2BJetTags.tagInfos = cms.VInputTag(
+    cms.InputTag("akPu4PFImpactParameterTagInfos"),
+    cms.InputTag("akPu4PFSecondaryVertexTagInfos"))
 
 process.akCs4PFCombinedSecondaryVertexV2BJetTags = process.pfCSVscikitJetTags.clone()
-process.akCs4PFCombinedSecondaryVertexV2BJetTags.tagInfos=cms.VInputTag(cms.InputTag("akCs4PFImpactParameterTagInfos"), cms.InputTag("akCs4PFSecondaryVertexTagInfos"))
+process.akCs4PFCombinedSecondaryVertexV2BJetTags.tagInfos = cms.VInputTag(
+    cms.InputTag("akCs4PFImpactParameterTagInfos"),
+    cms.InputTag("akCs4PFSecondaryVertexTagInfos"))
 
 process.akPu4CaloCombinedSecondaryVertexV2BJetTags = process.pfCSVscikitJetTags.clone()
-process.akPu4CaloCombinedSecondaryVertexV2BJetTags.tagInfos=cms.VInputTag(cms.InputTag("akPu4CaloImpactParameterTagInfos"), cms.InputTag("akPu4CaloSecondaryVertexTagInfos"))
+process.akPu4CaloCombinedSecondaryVertexV2BJetTags.tagInfos = cms.VInputTag(
+    cms.InputTag("akPu4CaloImpactParameterTagInfos"),
+    cms.InputTag("akPu4CaloSecondaryVertexTagInfos"))
 #process.CSVscikitTags.weightFile=cms.FileInPath('HeavyIonsAnalysis/JetAnalysis/data/bTagCSVv2PbPb_758p3_Jan2017_BDTG_weights.xml')
 #trained on Cs jets!
 process.CSVscikitTags.weightFile=cms.FileInPath('HeavyIonsAnalysis/JetAnalysis/data/TMVA_Btag_CsJets_PbPb_BDTG.weights.xml')

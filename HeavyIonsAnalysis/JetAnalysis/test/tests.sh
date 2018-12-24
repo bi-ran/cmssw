@@ -4,8 +4,10 @@ helpmessage() {
    echo -e "usage: tests [options]\n"
    echo -e "   -h, --help     show (this) help message"
    echo -e "   -i, --input    directory for inputs"
+   echo -e "   -j, --jobs     number of jobs in parallel"
    echo -e "   -o, --output   keep output of tests"
    echo -e "   -s, --sample   keep samples"
+   echo -e "   -t, --travis   customisation for travis build"
 }
 
 ARGS=()
@@ -15,8 +17,11 @@ while [ $# -gt 0 ]; do
       -h|--help)     helpmessage; exit 0 ;;
       -i|--input)    inputdir="$2"; shift 2 ;;
       --input=*)     inputdir="${1#*=}"; shift ;;
+      -j|--jobs)     njobs="$2"; shift 2 ;;
+      --jobs=*)      njobs="${1#*=}"; shift ;;
       -o|--output)   keepoutput=1; shift ;;
       -s|--sample)   keepsample=1; shift ;;
+      -t|--travis)   travis=1; shift ;;
       -*)            echo -e "invalid option: $1\n"; exit 1 ;;
       *)             ARGS+=("$1"); shift ;;
    esac
@@ -60,6 +65,18 @@ configs=(
    runForestAOD_pponAA_DATA_103X.py
 )
 
+[ $travis ] && {
+   exclude=(
+      runForestAOD_HI_MB_103X.py
+      runForestAOD_HI_MIX_103X.py
+      runForestAOD_pponAA_JEC_103X.py
+   )
+
+   for e in ${exclude[@]}; do
+      configs=( ${configs[@]/$e} )
+   done
+}
+
 for c in ${configs[@]}; do
    if [[ $c == *"DATA"* ]]; then
       input=$sampledir/$(basename ${samples[2]})
@@ -83,21 +100,32 @@ done
 pushd $area > /dev/null
 mkdir logs
 
-echo -e "\n  running configs...\n"
+echo -ne "\n  running configs"
 
 children=()
+exitc=()
 for c in ${configs[@]}; do
    cmsRun test_$c &> logs/test_${c%.*}.log &
    children+=("$!")
+
+   if [ $njobs ] && [ ${#children[@]} -eq $njobs ]; then
+      wait ${children[0]}; exitc+=("$?"); printf .
+      unset children[0]; children=( "${children[@]}" )
+   fi
 done
 
 for c in "${!children[@]}"; do
+   wait ${children[$c]}
+   exitc+=("$?")
+   printf .
+done
+
+echo
+
+for c in "${!exitc[@]}"; do
    config=${configs[$c]}
 
-   wait ${children[$c]}
-   retc=$?
-
-   if [ $retc -eq 0 ]; then
+   if [ ${exitc[$c]} -eq 0 ]; then
       echo -e "\E[32mPASS: $config\E[0m"
    else
       fail=1
@@ -123,3 +151,5 @@ popd > /dev/null
 [ $keepoutput ] && echo -e "\n  output kept:\n\E[34m$area\E[0m"
 
 echo -e "\n  done\n"
+
+exit $fail

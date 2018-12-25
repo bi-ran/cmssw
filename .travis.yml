@@ -1,0 +1,21 @@
+dist: xenial
+
+language: minimal
+
+git:
+  depth: 3
+
+branches:
+  only:
+    - forest_CMSSW_10_3_1
+
+services:
+  - docker
+
+script:
+  - docker run
+    -v $(pwd)/travis-tests.sh:/build/travis-tests.sh
+    -e TRAVIS_BRANCH=$TRAVIS_BRANCH
+    -e TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
+    -e TRAVIS_PULL_REQUEST_SLUG=$TRAVIS_PULL_REQUEST_SLUG
+    biran91/cmssw-scratch:slc6-cmssw-10.3.1 bash /build/travis-tests.sh

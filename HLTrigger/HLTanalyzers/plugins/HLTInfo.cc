@@ -24,8 +24,6 @@ HLTInfo::HLTInfo() {
 
   //set parameter defaults 
   _Debug=false;
-  _OR_BXes=false;
-  UnpackBxInEvent=1;
 }
 
 void HLTInfo::beginRun(const edm::Run& run, const edm::EventSetup& c){ 
@@ -71,21 +69,7 @@ void HLTInfo::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
 
   L1EvtCnt = 0;
   l1flag = new int[kMaxL1Flag];
-  l1flag5Bx = new int[kMaxTrigFlag];
   l1Prescl = new int[kMaxL1Flag];
-
-  l1techflag = new int[kMaxL1Flag];
-  //  l1techflag5Bx = new int[kMaxTrigFlag];
-  l1techPrescl = new int[kMaxTrigFlag];
-
-  const int kMaxHLTPart = 10000;
-  hltppt = new float[kMaxHLTPart];
-  hltpeta = new float[kMaxHLTPart];
-
-  algoBitToName = new TString[512];
-  techBitToName = new TString[512];
-  
-
 }
 
 /* **Analyze the event** */
@@ -163,12 +147,7 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
   auto& l1GtUtils = const_cast<l1t::L1TGlobalUtil&>(hltPrescaleProvider_->l1tGlobalUtil());
 
   l1GtUtils.retrieveL1(iEvent,eventSetup);
-  /*
-  unsigned long long id = eventSetup.get<L1TUtmTriggerMenuRcd>().cacheIdentifier();
-  
-  if (id != cache_id_) {
-    cache_id_ = id; 
-  */
+
   edm::ESHandle<L1TUtmTriggerMenu> menu;
   eventSetup.get<L1TUtmTriggerMenuRcd>().get(menu);
 

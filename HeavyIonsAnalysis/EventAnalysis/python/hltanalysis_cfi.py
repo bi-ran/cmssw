@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from HeavyIonsAnalysis.EventAnalysis.dummybranches_cff import *
+
 hltanalysis = cms.EDAnalyzer('HLTBitAnalyzer',
     HLTProcessName = cms.string('HLT'),
     hltresults = cms.InputTag('TriggerResults::HLT'),
@@ -7,7 +9,7 @@ hltanalysis = cms.EDAnalyzer('HLTBitAnalyzer',
     UseTFileService = cms.untracked.bool(True),
     RunParameters = cms.PSet(
         isData = cms.untracked.bool(True)),
-    dummyBranches = cms.untracked.vstring(),
+    dummyBranches = dummy_branches_for_PbPb_2018,
 
     mctruth = cms.InputTag(''),
     genEventInfo = cms.InputTag(''),

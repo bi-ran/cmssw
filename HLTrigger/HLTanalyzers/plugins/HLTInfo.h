@@ -40,6 +40,8 @@ namespace edm {
 
 typedef std::vector<std::string> MyStrings;
 
+constexpr int kMaxTrigFlag = 10000;
+
 /** \class HLTInfo
   *  
   * $Date: November 2006
@@ -87,6 +89,8 @@ private:
   TString * algoBitToName;
   TString * techBitToName;
   std::vector<std::string> dummyBranches_;
+
+  std::map<std::string, int> pathtoindex;
 
   //HLTConfigProvider hltConfig_; 
   //L1GtUtils m_l1GtUtils;

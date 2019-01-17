@@ -65,7 +65,6 @@ void HLTInfo::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   dummyBranches_ = pSet.getUntrackedParameter<std::vector<std::string> >("dummyBranches",std::vector<std::string>(0));
 
   HltEvtCnt = 0;
-  const int kMaxTrigFlag = 10000;
   trigflag = new int[kMaxTrigFlag];
   trigPrescl = new int[kMaxTrigFlag];
 
@@ -107,26 +106,24 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 
     // 1st event : Book as many branches as trigger paths provided in the input...
     if (HltEvtCnt==0){
-      for (int itrig = 0; itrig != ntrigs; ++itrig) {
-        TString trigName = triggerNames.triggerName(itrig);
-        HltTree->Branch(trigName,trigflag+itrig,trigName+"/I");
-        HltTree->Branch(trigName+"_Prescl",trigPrescl+itrig,trigName+"_Prescl/I");
-      }
-
-      int itdum = ntrigs;
+      int itdum = 0;
       for (auto & dummyBranche : dummyBranches_) {
 	TString trigName(dummyBranche.data());
-	bool addThisBranch = true;
-	for (int itrig = 0; itrig != ntrigs; ++itrig) {
-	  TString realTrigName = triggerNames.triggerName(itrig);
-	  if(trigName == realTrigName) addThisBranch = false;
-	}
-	if(addThisBranch){
-	  HltTree->Branch(trigName,trigflag+itdum,trigName+"/I");
-	  HltTree->Branch(trigName+"_Prescl",trigPrescl+itdum,trigName+"_Prescl/I");
-	  trigflag[itdum] = 0;
-	  trigPrescl[itdum] = 0;
-	  ++itdum;
+	HltTree->Branch(trigName,trigflag+itdum,trigName+"/I");
+	HltTree->Branch(trigName+"_Prescl",trigPrescl+itdum,trigName+"_Prescl/I");
+	trigflag[itdum] = 0;
+	trigPrescl[itdum] = 0;
+	pathtoindex[dummyBranche] = itdum;
+	++itdum;
+      }
+
+      for (int itrig = 0; itrig != ntrigs; ++itrig) {
+        const std::string& trigName = triggerNames.triggerName(itrig);
+	if (pathtoindex.find(trigName) == pathtoindex.end()) {
+	  TString TSname = trigName;
+	  HltTree->Branch(TSname,trigflag+itdum+itrig,TSname+"/I");
+	  HltTree->Branch(TSname+"_Prescl",trigPrescl+itdum+itrig,TSname+"_Prescl/I");
+	  pathtoindex[trigName] = itdum + itrig;
 	}
       }
 
@@ -134,22 +131,21 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
     }
     // ...Fill the corresponding accepts in branch-variables
 
-    //std::cout << "Number of prescale sets: " << hltConfig_.prescaleSize() << std::endl;
-    //std::cout << "Number of HLT paths: " << hltConfig_.size() << std::endl;
-    //int presclSet = hltConfig_.prescaleSet(iEvent, eventSetup);
-    //std::cout<<"\tPrescale set number: "<< presclSet <<std::endl; 
+    /* reset accept status to -1 */
+    for (int i = 0; i < kMaxTrigFlag; ++i) {
+      trigflag[i] = -1;
+      trigPrescl[i] = -1;
+    }
 
     for (int itrig = 0; itrig != ntrigs; ++itrig){
 
       const std::string& trigName=triggerNames.triggerName(itrig);
       bool accept = hltresults->accept(itrig);
 
-      //trigPrescl[itrig] = hltConfig_.prescaleValue(iEvent, eventSetup, trigName);
-      trigPrescl[itrig] = hltPrescaleProvider_->prescaleValue(iEvent, eventSetup, trigName);
+      int index = pathtoindex[trigName];
+      trigPrescl[index] = hltPrescaleProvider_->prescaleValue(iEvent, eventSetup, trigName);
 
-
-      if (accept){trigflag[itrig] = 1;}
-      else {trigflag[itrig] = 0;}
+      trigflag[index] = accept;
 
       if (_Debug){
         if (_Debug) std::cout << "%HLTInfo --  Number of HLT Triggers: " << ntrigs << std::endl;

@@ -41,6 +41,7 @@ namespace edm {
 typedef std::vector<std::string> MyStrings;
 
 constexpr int kMaxTrigFlag = 10000;
+constexpr int kMaxL1Flag = 10000;
 
 /** \class HLTInfo
   *  
@@ -89,6 +90,7 @@ private:
   TString * algoBitToName;
   TString * techBitToName;
   std::vector<std::string> dummyBranches_;
+  std::vector<std::string> l1dummies;
 
   std::map<std::string, int> pathtoindex;
 

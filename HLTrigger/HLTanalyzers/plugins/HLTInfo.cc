@@ -63,13 +63,13 @@ void HLTInfo::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   }
 
   dummyBranches_ = pSet.getUntrackedParameter<std::vector<std::string> >("dummyBranches",std::vector<std::string>(0));
+  l1dummies = pSet.getUntrackedParameter<std::vector<std::string> >("l1dummyBranches",std::vector<std::string>(0));
 
   HltEvtCnt = 0;
   trigflag = new int[kMaxTrigFlag];
   trigPrescl = new int[kMaxTrigFlag];
 
   L1EvtCnt = 0;
-  const int kMaxL1Flag = 10000;
   l1flag = new int[kMaxL1Flag];
   l1flag5Bx = new int[kMaxTrigFlag];
   l1Prescl = new int[kMaxL1Flag];
@@ -171,39 +171,38 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
   */
   edm::ESHandle<L1TUtmTriggerMenu> menu;
   eventSetup.get<L1TUtmTriggerMenuRcd>().get(menu);
-  //std::map<std::string, L1TUtmAlgorithm> const & algorithmMap_ = &(menu->getAlgorithmMap());    
-  /*
-  // get the bit/name association
-  for (auto const & keyval: menu->getAlgorithmMap()) {
-    std::string const & name  = keyval.second.getName();
-    unsigned int        index = keyval.second.getIndex();
-    std::cerr << "bit: " << index << "\tname: " << name << std::endl;
-  }
-  */
-    //} // end get menu
 
-  // 1st event : Book as many branches as trigger paths provided in the input...
   if (l1results.isValid() && l1results->size() != 0) {
-    /*
-    edm::TriggerNames const& triggerNames = iEvent.triggerNames(&results);
-    // 1st event : Book as many branches as trigger paths provided in the input...
-    */
-    if (L1EvtCnt==0){
+    /* reset accept status to -1 */
+    for (int i = 0; i < kMaxL1Flag; ++i) {
+      l1flag[i] = -1;
+      l1Prescl[i] = -1;
+    }
 
+    // 1st event : Book as many branches as trigger paths provided in the input...
+    if (L1EvtCnt==0){
+      int itdum = 0;
+      for (auto & dummy : l1dummies) {
+	TString trigName(dummy.data());
+	HltTree->Branch(trigName,trigflag+itdum,trigName+"/I");
+	HltTree->Branch(trigName+"_Prescl",trigPrescl+itdum,trigName+"_Prescl/I");
+	trigflag[itdum] = 0;
+	trigPrescl[itdum] = 0;
+	pathtoindex[dummy] = itdum;
+	++itdum;
+      }
+
+      int il1 = 0;
       // get the bit/name association         
       for (auto const & keyval: menu->getAlgorithmMap()) { 
-	std::string const & trigName  = keyval.second.getName(); 
-	unsigned int index = keyval.second.getIndex(); 
-	if (_Debug) std::cerr << "bit: " << index << "\tname: " << trigName << std::endl;
+	std::string const & l1trigName  = keyval.second.getName();
 	  
-	int itrig = index;
- 	algoBitToName[itrig] = TString( trigName );
-	
-	TString l1trigName = static_cast<const char *>(algoBitToName[itrig]);
-	std::string l1triggername = static_cast<const char *>(algoBitToName[itrig]);
-
-	HltTree->Branch(l1trigName,l1flag+itrig,l1trigName+"/I");                    
-        HltTree->Branch(l1trigName+"_Prescl",l1Prescl+itrig,l1trigName+"_Prescl/I"); 
+	if (pathtoindex.find(l1trigName) == pathtoindex.end()) {
+	  TString l1TSname = l1trigName;
+	  HltTree->Branch(l1TSname,l1flag+itdum+il1,l1TSname+"/I");
+	  HltTree->Branch(l1TSname+"_Prescl",l1Prescl+itdum+il1,l1TSname+"_Prescl/I");
+	  pathtoindex[l1trigName] = itdum + il1;
+	}
 
       } // end algo Map
 
@@ -213,19 +212,16 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
     GlobalAlgBlk const &result = l1results->at(0, 0);
 
     // get the individual decisions from the GlobalAlgBlk
-    for (unsigned int itrig = 0; itrig < result.maxPhysicsTriggers; ++itrig) {
-       //      std::cerr << "bit: " << itrig << "\tresult: " << results.getAlgoDecisionFinal(itrig) << std::endl;
+    for (auto const& keyval : menu->getAlgorithmMap()) {
+      auto const& l1pathname = keyval.second.getName();
+      int l1index = keyval.second.getIndex();
 
-      bool myflag = result.getAlgoDecisionFinal(itrig) ; 
-      if (myflag ) { l1flag[itrig] = 1; }
-      else {l1flag[itrig] =0 ; }
+      int index = pathtoindex[l1pathname];
 
-      int index = itrig;
-      l1GtUtils.getPrescaleByBit(index, l1Prescl[itrig]);
+      bool accept = result.getAlgoDecisionFinal(l1index);
+      l1flag[index] = accept;
 
-      if (_Debug) std::cout << "L1 TD: "<<itrig<<" "<<algoBitToName[itrig]<<" " 
-			    << l1flag[itrig] <<" " 
-			    << l1Prescl[itrig] << std::endl;           
+      l1GtUtils.getPrescaleByBit(l1index, l1Prescl[index]);
     }
 
     //    L1EvtCnt++;

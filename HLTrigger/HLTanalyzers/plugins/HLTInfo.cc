@@ -181,6 +181,7 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 	  HltTree->Branch(l1TSname,l1flag+itdum+il1,l1TSname+"/I");
 	  HltTree->Branch(l1TSname+"_Prescl",l1Prescl+itdum+il1,l1TSname+"_Prescl/I");
 	  pathtoindex[l1trigName] = itdum + il1;
+	  ++il1;
 	}
 
       } // end algo Map

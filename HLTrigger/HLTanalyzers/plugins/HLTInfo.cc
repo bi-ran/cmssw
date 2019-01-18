@@ -1,13 +1,4 @@
-#include <iostream>
-#include <sstream>
-#include <istream>
-#include <fstream>
-#include <iomanip>
-#include <string>
-#include <cmath>
-#include <functional>
-#include <cstdlib>
-#include <cstring>
+#include <ostream>
 
 #include "HLTInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -17,17 +8,12 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "L1Trigger/L1TGlobal/interface/L1TGlobalUtil.h"
 
-//static const bool useL1EventSetup(true);
-//static const bool useL1GtTriggerMenuLite(false);
-
 HLTInfo::HLTInfo() {
-
-  //set parameter defaults 
-  _Debug=false;
+  //set parameter defaults
+  _Debug = false;
 }
 
-void HLTInfo::beginRun(const edm::Run& run, const edm::EventSetup& c){ 
-
+void HLTInfo::beginRun(const edm::Run& run, const edm::EventSetup& c){
 
   bool changed(true);
   if (hltPrescaleProvider_->init(run,c,processName_,changed)) {
@@ -35,16 +21,14 @@ void HLTInfo::beginRun(const edm::Run& run, const edm::EventSetup& c){
     if (changed) {
       // The HLT config has actually changed wrt the previous Run, hence rebook your
       // histograms or do anything else dependent on the revised HLT config
-      std::cout << "Initalizing HLTConfigProvider"  << std::endl;
+      edm::LogInfo("HLTInfo") << "Initalizing HLTConfigProvider\n";
     }
   } else {
     // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
     // with the file and/or code and needs to be investigated!
-    std::cout << " HLT config extraction failure with process name " << processName_ << std::endl;
+    edm::LogWarning("HLTInfo") << "HLT config extraction failure with process name " << processName_ << "\n";
     // In this case, all access methods will return empty values!
   }
-
-  
 
 }
 
@@ -53,11 +37,10 @@ void HLTInfo::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
 
   processName_ = pSet.getParameter<std::string>("HLTProcessName") ;
 
-  edm::ParameterSet myHltParams = pSet.getParameter<edm::ParameterSet>("RunParameters") ;
-  std::vector<std::string> parameterNames = myHltParams.getParameterNames() ;
-  
-  for (auto & parameterName : parameterNames){
-    if ( parameterName == "Debug" ) _Debug =  myHltParams.getParameter<bool>( parameterName );
+  std::vector<std::string> parameterNames = pSet.getParameterNames() ;
+  if (std::find(parameterNames.begin(), parameterNames.end(), "Debug")
+      != parameterNames.end()) {
+    _Debug = pSet.getParameter<bool>( "Debug" );
   }
 
   dummyBranches_ = pSet.getUntrackedParameter<std::vector<std::string> >("dummyBranches",std::vector<std::string>(0));
@@ -79,12 +62,12 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 		      edm::Event const& iEvent,
                       TTree* HltTree) {
 
-//   std::cout << " Beginning HLTInfo " << std::endl;
-
   /////////// Analyzing HLT Trigger Results (TriggerResults) //////////
   if (hltresults.isValid()) {
     int ntrigs = hltresults->size();
-    if (ntrigs==0){std::cout << "%HLTInfo -- No trigger name given in TriggerResults of the input " << std::endl;}
+    if (ntrigs==0) {
+      edm::LogWarning("HLTInfo") << "No trigger name given in TriggerResults of the input" << std::endl;
+    }
 
     edm::TriggerNames const& triggerNames = iEvent.triggerNames(*hltresults);
 
@@ -122,22 +105,22 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
     }
 
     for (int itrig = 0; itrig != ntrigs; ++itrig){
-
-      const std::string& trigName=triggerNames.triggerName(itrig);
+      const std::string& trigName = triggerNames.triggerName(itrig);
       bool accept = hltresults->accept(itrig);
 
       int index = pathtoindex[trigName];
+      trigflag[index] = accept;
       trigPrescl[index] = hltPrescaleProvider_->prescaleValue(iEvent, eventSetup, trigName);
 
-      trigflag[index] = accept;
-
       if (_Debug){
-        if (_Debug) std::cout << "%HLTInfo --  Number of HLT Triggers: " << ntrigs << std::endl;
-        std::cout << "%HLTInfo --  HLTTrigger(" << itrig << "): " << trigName << " = " << accept << std::endl;
+	edm::LogInfo("HLTInfo") << "Number of HLT Triggers: " << ntrigs << std::endl;
+        edm::LogInfo("HLTInfo") << "HLTTrigger(" << itrig << "): " << trigName << " = " << accept << std::endl;
       }
     }
   }
-  else { if (_Debug) std::cout << "%HLTInfo -- No Trigger Result" << std::endl;}
+  else {
+    if (_Debug) edm::LogInfo("HLTInfo") << "No Trigger Result" << std::endl;
+  }
 
 
 
@@ -172,10 +155,10 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
       }
 
       int il1 = 0;
-      // get the bit/name association         
-      for (auto const & keyval: menu->getAlgorithmMap()) { 
-	std::string const & l1trigName  = keyval.second.getName();
-	  
+      // get the bit/name association
+      for (auto const & keyval: menu->getAlgorithmMap()) {
+	std::string const & l1trigName = keyval.second.getName();
+
 	if (pathtoindex.find(l1trigName) == pathtoindex.end()) {
 	  TString l1TSname = l1trigName;
 	  HltTree->Branch(l1TSname,l1flag+itdum+il1,l1TSname+"/I");
@@ -183,29 +166,24 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 	  pathtoindex[l1trigName] = itdum + il1;
 	  ++il1;
 	}
-
       } // end algo Map
 
-      L1EvtCnt++;     
+      L1EvtCnt++;
     } // end l1evtCnt=0
-  
-    GlobalAlgBlk const &result = l1results->at(0, 0);
 
+    GlobalAlgBlk const &result = l1results->at(0, 0);
     // get the individual decisions from the GlobalAlgBlk
     for (auto const& keyval : menu->getAlgorithmMap()) {
       auto const& l1pathname = keyval.second.getName();
-      int l1index = keyval.second.getIndex();
 
+      int l1index = keyval.second.getIndex();
       int index = pathtoindex[l1pathname];
 
-      bool accept = result.getAlgoDecisionFinal(l1index);
-      l1flag[index] = accept;
-
+      l1flag[index] = result.getAlgoDecisionFinal(l1index);
       l1GtUtils.getPrescaleByBit(l1index, l1Prescl[index]);
     }
 
-    //    L1EvtCnt++;
-    if (_Debug) std::cout << "%L1Info -- Done with routine" << std::endl;                                                                         
+    if (_Debug) std::cout << "%L1Info -- Done with routine" << std::endl;
 
   } // l1results.isValid
   else { edm::LogWarning("HLTInfo") << "%L1Results -- No L1 Results" << std::endl; }

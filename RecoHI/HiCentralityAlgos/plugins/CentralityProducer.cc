@@ -25,6 +25,7 @@
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
+#include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 
 #include "DataFormats/Common/interface/Ref.h"
@@ -86,8 +87,8 @@ class CentralityProducer : public edm::EDProducer {
 
   edm::EDGetTokenT<HFRecHitCollection>  srcHFhits_;	
   edm::EDGetTokenT<CaloTowerCollection>  srcTowers_;
-  edm::EDGetTokenT<EcalRecHitCollection> srcEEhits_;
-  edm::EDGetTokenT<EcalRecHitCollection> srcEBhits_;
+  edm::EDGetTokenT<HGCRecHitCollection> srcEEhits_;
+  edm::EDGetTokenT<HGCRecHitCollection> srcEBhits_;
   edm::EDGetTokenT<ZDCRecHitCollection> srcZDChits_;
   edm::EDGetTokenT<SiPixelRecHitCollection> srcPixelhits_;
   edm::EDGetTokenT<TrackCollection> srcTracks_;
@@ -137,8 +138,8 @@ class CentralityProducer : public edm::EDProducer {
    if(produceHFtowers_ || produceETmidRap_) srcTowers_ = consumes<CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("srcTowers"));
 
    if(produceEcalhits_){
-     srcEBhits_ = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("srcEBhits"));
-     srcEEhits_ = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("srcEEhits"));
+     srcEBhits_ = consumes<HGCRecHitCollection>(iConfig.getParameter<edm::InputTag>("srcEBhits"));
+     srcEEhits_ = consumes<HGCRecHitCollection>(iConfig.getParameter<edm::InputTag>("srcEEhits"));
    }
    if(produceZDChits_){
      srcZDChits_ = consumes<ZDCRecHitCollection>(iConfig.getParameter<edm::InputTag>("srcZDChits"));
@@ -227,7 +228,7 @@ CentralityProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	for( size_t i = 0; i<towers->size(); ++ i){
 	   const CaloTower & tower = (*towers)[ i ];
 	   double eta = tower.eta();
-	   bool isHF = tower.ietaAbs() > 29;
+	   bool isHF = tower.ietaAbs() > 18; // Old index 28 -> Phase2 index Hcal 17
 	   if(produceHFtowers_){
 	      if(isHF && eta > 0){
 		 creco->etHFtowerSumPlus_ += tower.pt();
@@ -268,21 +269,21 @@ CentralityProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
      creco->etEESumMinus_ = 0;
      creco->etEBSum_ = 0;
 
-     Handle<EcalRecHitCollection> ebHits;
-     Handle<EcalRecHitCollection> eeHits;
+     Handle<HGCRecHitCollection> ebHits;
+     Handle<HGCRecHitCollection> eeHits;
 
      iEvent.getByToken(srcEBhits_,ebHits);
      iEvent.getByToken(srcEEhits_,eeHits);
 
      for(unsigned int i = 0; i < ebHits->size(); ++i){
-        const EcalRecHit & hit= (*ebHits)[i];
+        const HGCRecHit & hit= (*ebHits)[i];
         const GlobalPoint& pos=cGeo->getPosition(hit.id());
         double et = hit.energy()*(pos.perp()/pos.mag());
         creco->etEBSum_ += et;
      }
 
      for(unsigned int i = 0; i < eeHits->size(); ++i){
-        const EcalRecHit & hit= (*eeHits)[i];
+        const HGCRecHit & hit= (*eeHits)[i];
         const GlobalPoint& pos=cGeo->getPosition(hit.id());
         double et = hit.energy()*(pos.perp()/pos.mag());
         if(pos.z() > 0){

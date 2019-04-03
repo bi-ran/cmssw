@@ -1,0 +1,74 @@
+version: 2.1
+
+commands:
+    setup-cmssw:
+        steps:
+            - run: echo 'export PATH="/opt/cms/common:/opt/cms/bin:$PATH"' >> $BASH_ENV
+            - run: echo 'export cmssw_version="${CIRCLE_BRANCH#forest_}"' >> $BASH_ENV
+            - run: echo 'source /opt/cms/cmsset_default.sh' >> $BASH_ENV
+            - run: scramv1 project CMSSW $cmssw_version
+
+    setup-dummy-git:
+        steps:
+            - run: |
+                git config --global user.github docker-tmp
+                git config --global user.name docker-tmp
+                git config --global user.email "docker-tmp@cmsbuild"
+
+    setup-forest:
+        steps:
+            - run: |
+                cd $cmssw_version/src
+                eval `scramv1 runtime -sh`
+                git cms-merge-topic -u bi-ran:$CIRCLE_BRANCH
+
+    merge-pull-request:
+        steps:
+            - run: echo "merge pull request"
+
+    build-forest:
+        steps:
+            - run: |
+                cd $cmssw_version/src
+                eval `scramv1 runtime -sh`
+                pushd HeavyIonsAnalysis/JetAnalysis/python/jets
+                ./makeJetSequences.sh
+                popd
+                scram b
+
+    test-forest:
+        steps:
+            - run: |
+                cd $cmssw_version/src
+                eval `scramv1 runtime -sh`
+                cd HeavyIonsAnalysis/JetAnalysis/test
+                ./tests.sh
+
+    echo-variables:
+        steps:
+            - run: echo $CIRCLE_PR_NUMBER
+            - run: echo $CIRCLE_PR_REPONAME
+            - run: echo $CIRCLE_PR_USERNAME
+            - run: echo $CIRCLE_PULL_REQUEST
+
+jobs:
+    test-forest:
+        docker:
+            - image: biran91/cmssw-scratch:slc6-cmssw-10.3.1
+        steps:
+            - echo-variables
+            - setup-cmssw
+            - setup-dummy-git
+            - setup-forest
+            - merge-pull-request
+            - build-forest
+            - test-forest
+
+workflows:
+    version: 2
+    default:
+        jobs:
+            - test-forest:
+                filters:
+                    branches:
+                        only: forest_CMSSW_10_3_1

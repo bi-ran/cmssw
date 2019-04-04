@@ -14,9 +14,6 @@ commands:
                 git config --global user.github docker-tmp
                 git config --global user.name docker-tmp
                 git config --global user.email "docker-tmp@cmsbuild"
-            - run: mkdir ~/.ssh
-            - run: touch ~/.ssh/known_hosts
-            - run: ssh-keygen -R github.com,192.30.253.112
 
     setup-forest:
         steps:
@@ -27,6 +24,12 @@ commands:
 
     merge-pull-request:
         steps:
+            - run: |
+                mkdir ~/.ssh
+                for ip in $(dig @8.8.8.8 github.com +short); do
+                    ssh-keyscan github.com,$ip
+                    ssh-keyscan $ip
+                done 2>/dev/null >> ~/.ssh/known_hosts
             - run: |
                 cd $cmssw/src
                 eval `scramv1 runtime -sh`

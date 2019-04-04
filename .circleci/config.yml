@@ -14,6 +14,9 @@ commands:
                 git config --global user.github docker-tmp
                 git config --global user.name docker-tmp
                 git config --global user.email "docker-tmp@cmsbuild"
+            - run: ssh-keyscan github.com >> github_key
+            - run: ssh-keygen -lf github_key
+            - run: cat github_key >> ~/.ssh/known_hosts
 
     setup-forest:
         steps:
@@ -27,7 +30,7 @@ commands:
             - run: |
                 cd $cmssw/src
                 eval `scramv1 runtime -sh`
-                printf "%s\n" yes | git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
+                git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
                 git merge FETCH_HEAD --no-commit
 
     build-forest:

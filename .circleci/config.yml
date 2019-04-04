@@ -16,7 +16,8 @@ commands:
                 git config --global user.email "docker-tmp@cmsbuild"
             - run: ssh-keyscan github.com >> github_key
             - run: ssh-keygen -lf github_key
-            - run: cat github_key >> ~/.ssh/known_hosts
+            - run: mkdir .ssh
+            - run: cat github_key >> .ssh/known_hosts
 
     setup-forest:
         steps:

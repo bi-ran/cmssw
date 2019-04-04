@@ -4,9 +4,8 @@ commands:
     setup-cmssw:
         steps:
             - run: echo 'export PATH="/opt/cms/common:/opt/cms/bin:$PATH"' >> $BASH_ENV
-            - run: echo 'export cmssw_version="${CIRCLE_BRANCH#forest_}"' >> $BASH_ENV
             - run: echo 'source /opt/cms/cmsset_default.sh' >> $BASH_ENV
-            - run: scramv1 project CMSSW $cmssw_version
+            - run: scramv1 project CMSSW CMSSW_10_3_1
 
     setup-dummy-git:
         steps:
@@ -20,7 +19,7 @@ commands:
             - run: |
                 cd $cmssw_version/src
                 eval `scramv1 runtime -sh`
-                git cms-merge-topic -u bi-ran:$CIRCLE_BRANCH
+                git cms-merge-topic -u bi-ran:forest_CMSSW_10_3_1
 
     merge-pull-request:
         steps:

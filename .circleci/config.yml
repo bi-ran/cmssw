@@ -27,7 +27,7 @@ commands:
             - run: |
                 cd $cmssw/src
                 eval `scramv1 runtime -sh`
-                git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
+                printf "%s\n" yes | git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
                 git merge FETCH_HEAD --no-commit
 
     build-forest:

@@ -15,6 +15,7 @@ commands:
                 git config --global user.name docker-tmp
                 git config --global user.email "docker-tmp@cmsbuild"
             - run: mkdir .ssh
+            - run: touch .ssh/known_hosts
             - run: ssh-keygen -R github.com,192.30.253.112
 
     setup-forest:

@@ -3,9 +3,10 @@ version: 2.1
 commands:
     setup-cmssw:
         steps:
+            - run: echo 'export cmssw="CMSSW_10_3_1"' >> $BASH_ENV
             - run: echo 'export PATH="/opt/cms/common:/opt/cms/bin:$PATH"' >> $BASH_ENV
             - run: echo 'source /opt/cms/cmsset_default.sh' >> $BASH_ENV
-            - run: scramv1 project CMSSW CMSSW_10_3_1
+            - run: scramv1 project CMSSW $cmssw
 
     setup-dummy-git:
         steps:
@@ -17,14 +18,14 @@ commands:
     setup-forest:
         steps:
             - run: |
-                cd $cmssw_version/src
+                cd $cmssw/src
                 eval `scramv1 runtime -sh`
-                git cms-merge-topic -u bi-ran:forest_CMSSW_10_3_1
+                git cms-merge-topic -u bi-ran:forest_$cmssw
 
     merge-pull-request:
         steps:
             - run: |
-                cd $cmssw_version/src
+                cd $cmssw/src
                 eval `scramv1 runtime -sh`
                 git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
                 git merge FETCH_HEAD --no-commit
@@ -32,7 +33,7 @@ commands:
     build-forest:
         steps:
             - run: |
-                cd $cmssw_version/src
+                cd $cmssw/src
                 eval `scramv1 runtime -sh`
                 pushd HeavyIonsAnalysis/JetAnalysis/python/jets
                 ./makeJetSequences.sh
@@ -42,7 +43,7 @@ commands:
     test-forest:
         steps:
             - run: |
-                cd $cmssw_version/src
+                cd $cmssw/src
                 eval `scramv1 runtime -sh`
                 cd HeavyIonsAnalysis/JetAnalysis/test
                 ./tests.sh

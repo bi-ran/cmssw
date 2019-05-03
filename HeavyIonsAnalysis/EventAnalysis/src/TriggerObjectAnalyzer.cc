@@ -103,14 +103,20 @@ TriggerObjectAnalyzer::TriggerObjectAnalyzer(const edm::ParameterSet& ps):
   triggerEventToken_(consumes<trigger::TriggerEvent>(triggerEventTag_))
 {
 	//now do what ever initialization is needed
-	if(!loadTriggersFromHLT_){	
-		nt_.reserve(triggerNames_.size());
-		for(unsigned int isize=0; isize<triggerNames_.size(); isize++){
-			nt_[isize] = fs->make<TTree>(triggerNames_.at(isize).c_str(),Form("trigger %d",isize));
-		}
-	}
-	verbose_ = 0;
-	evtCounter = 0;
+  if(!loadTriggersFromHLT_){
+    nt_.reserve(triggerNames_.size());
+    for(unsigned int isize=0; isize<triggerNames_.size(); isize++){
+      nt_[isize] = fs->make<TTree>(triggerNames_.at(isize).c_str(),Form("trigger %d",isize));
+
+      nt_[isize]->Branch("TriggerObjID",&(id[isize]));
+      nt_[isize]->Branch("pt",&(pt[isize]));
+      nt_[isize]->Branch("eta",&(eta[isize]));
+      nt_[isize]->Branch("phi",&(phi[isize]));
+      nt_[isize]->Branch("mass",&(mass[isize]));
+    }
+  }
+  verbose_ = 0;
+  evtCounter = 0;
 }
 
 
@@ -270,14 +276,6 @@ TriggerObjectAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSe
     cout << "HLTObjectAnalyzer::analyze:"
 	 << " config extraction failure with process name "
 	 << processName_ << endl;
-  }
-
-  for(unsigned int itrig=0; itrig<triggerNames_.size(); itrig++){
-    nt_[itrig]->Branch("TriggerObjID",&(id[itrig]));
-    nt_[itrig]->Branch("pt",&(pt[itrig]));
-    nt_[itrig]->Branch("eta",&(eta[itrig]));
-    nt_[itrig]->Branch("phi",&(phi[itrig]));
-    nt_[itrig]->Branch("mass",&(mass[itrig]));
   }
 }
 

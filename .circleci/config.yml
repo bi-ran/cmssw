@@ -31,10 +31,12 @@ commands:
                     ssh-keyscan $ip
                 done 2>/dev/null >> ~/.ssh/known_hosts
             - run: |
-                cd $cmssw/src
-                eval `scramv1 runtime -sh`
-                git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
-                git merge FETCH_HEAD --no-commit
+                if [ -n "$CIRCLE_PR_NUMBER" ]; then
+                    cd $cmssw/src
+                    eval `scramv1 runtime -sh`
+                    git fetch $CIRCLE_REPOSITORY_URL pull/$CIRCLE_PR_NUMBER/head
+                    git merge FETCH_HEAD --no-commit
+                fi
 
     build-forest:
         steps:

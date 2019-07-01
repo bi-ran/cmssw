@@ -50,7 +50,7 @@ using namespace std;
 using namespace RooFit;
 
 TagProbeFitter::TagProbeFitter(const std::vector<std::string>& inputFileNames, string inputDirectoryName, string inputTreeName, string outputFileName, int numCPU_, bool saveWorkspace_, bool floatShapeParameters_, const std::vector<std::string>& fixVars_){
-  inputTree = new TChain((inputDirectoryName+"/"+inputTreeName).c_str());
+  inputTree = new TChain((inputTreeName).c_str());
   for(size_t i=0; i<inputFileNames.size(); i++){
     inputTree->Add(inputFileNames[i].c_str());
   }

@@ -10,6 +10,7 @@
 #include "TGraphAsymmErrors.h"
 #include "TH2F.h"
 #include "TStyle.h"
+#include "TLatex.h"
 #include "Math/QuantFuncMathCore.h"
 #include "Roo1DTable.h"
 #include "RooAbsDataStore.h"
@@ -28,6 +29,7 @@
 #include "RooGaussian.h"
 #include "RooGenericPdf.h"
 #include "RooGlobalFunc.h"
+#include "RooHist.h"
 #include "RooLinkedListIter.h"
 #include "RooMappedCategory.h"
 #include "RooMinimizer.h"
@@ -735,51 +737,92 @@ void TagProbeFitter::saveFitPlot(RooWorkspace* w){
     break;
   }
   if(!mass) return;
+
+  std::string dirname = gDirectory->GetName();
   // make a 2x2 canvas
-  TCanvas canvas("fit_canvas");
-  canvas.Divide(2,2);
+  TCanvas* cfits = new TCanvas("fit_canvas");
+  cfits->Divide(3, 2);
   vector<RooPlot*> frames;
   // plot the Passing Probes
-  canvas.cd(1);
   if (massBins == 0) {
-      frames.push_back(mass->frame(Name("Passing"), Title("Passing Probes")));
-      frames.push_back(mass->frame(Name("Failing"), Title("Failing Probes")));
-      frames.push_back(mass->frame(Name("All"),     Title("All Probes")));
+    frames.push_back(mass->frame(Title("Passing Probes")));
+    frames.push_back(mass->frame(Title("Failing Probes")));
+    frames.push_back(mass->frame(Title("All Probes")));
+    frames.push_back(mass->frame(Title("Passing Probes")));
+    frames.push_back(mass->frame(Title("Failing Probes")));
+    frames.push_back(mass->frame(Title("All Probes")));
   } else {
-      frames.push_back(mass->frame(Name("Passing"), Title("Passing Probes"), Bins(massBins)));
-      frames.push_back(mass->frame(Name("Failing"), Title("Failing Probes"), Bins(massBins)));
-      frames.push_back(mass->frame(Name("All"),     Title("All Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("Passing Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("Failing Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("All Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("Passing Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("Failing Probes"), Bins(massBins)));
+    frames.push_back(mass->frame(Title("All Probes"), Bins(massBins)));
   }
+  cfits->cd(1);
   dataPass->plotOn(frames[0]);
-  pdf.plotOn(frames[0], Slice(efficiencyCategory, "Passed"), ProjWData(*dataPass), LineColor(kGreen));
   pdf.plotOn(frames[0], Slice(efficiencyCategory, "Passed"), ProjWData(*dataPass), LineColor(kGreen), Components("backgroundPass"), LineStyle(kDashed));
+  pdf.plotOn(frames[0], Slice(efficiencyCategory, "Passed"), ProjWData(*dataPass), LineColor(kGreen));
   frames[0]->Draw();
   // plot the Failing Probes
-  canvas.cd(2);
+  cfits->cd(2);
   dataFail->plotOn(frames[1]);
-  pdf.plotOn(frames[1], Slice(efficiencyCategory, "Failed"), ProjWData(*dataFail), LineColor(kRed));
   pdf.plotOn(frames[1], Slice(efficiencyCategory, "Failed"), ProjWData(*dataFail), LineColor(kRed), Components("backgroundFail"), LineStyle(kDashed));
+  pdf.plotOn(frames[1], Slice(efficiencyCategory, "Failed"), ProjWData(*dataFail), LineColor(kRed));
   frames[1]->Draw();
   // plot the All Probes
-  canvas.cd(3);
-  dataAll->plotOn(frames.back());
-  pdf.plotOn(frames.back(), ProjWData(*dataAll), LineColor(kBlue));
-  pdf.plotOn(frames.back(), ProjWData(*dataAll), LineColor(kBlue), Components("backgroundPass,backgroundFail"), LineStyle(kDashed));
-  frames.back()->Draw();
+  cfits->cd(3);
+  dataAll->plotOn(frames[2]);
+  pdf.plotOn(frames[2], ProjWData(*dataAll), LineColor(kBlue), Components("backgroundPass,backgroundFail"), LineStyle(kDashed));
+  pdf.plotOn(frames[2], ProjWData(*dataAll), LineColor(kBlue));
+  frames[2]->Draw();
+
+  auto text_lambda = [](float value) {
+    std::string valstr = std::to_string(value);
+    TLatex* l = new TLatex();
+    l->SetTextFont(43);
+    l->SetTextSize(11);
+    l->DrawLatexNDC(0.45, 0.8, ("#chi^{2}/ndf: "s + valstr).data());
+  };
+
+  RooFitResult* result = (RooFitResult*)gDirectory->Get("fitresults");
+  int32_t ndof = result->floatParsFinal().getSize();
+
+  cfits->cd(4);
+  auto pullpass = frames[0]->pullHist();
+  frames[3]->addPlotable(pullpass);
+  frames[3]->Draw();
+  text_lambda(frames[0]->chiSquare(ndof));
+  cfits->cd(5);
+  auto pullfail = frames[0]->pullHist();
+  frames[4]->addPlotable(pullfail);
+  frames[4]->Draw();
+  text_lambda(frames[1]->chiSquare(ndof));
+  cfits->cd(6);
+  auto pullall = frames[0]->pullHist();
+  frames[5]->addPlotable(pullall);
+  frames[5]->Draw();
+  text_lambda(frames[2]->chiSquare(ndof));
+  cfits->Draw();
+  cfits->Write();
+  cfits->SaveAs(("cfits_"s + dirname + ".pdf").data());
   // plot the Fit Results
-  canvas.cd(4);
-  frames.push_back(mass->frame(Name("Fit Results"), Title("Fit Results")));
-  pdf.paramOn(frames.back(), dataAll, "", 0, "NELU", 0.1, 0.9, 0.9);
+  TCanvas* cinfo = new TCanvas("info_canvas");
+  auto info_frame = mass->frame(Name("Fit Results"), Title("Fit Results"));
+  pdf.paramOn(info_frame, dataAll, "", 0, "NELU", 0.1, 0.9, 0.9);
   // draw only the parameter box not the whole frame
-  frames.back()->findObject(Form("%s_paramBox",pdf.GetName()))->Draw();
+  info_frame->findObject(Form("%s_paramBox",pdf.GetName()))->Draw();
+  cinfo->Draw();
+  cinfo->Write();
+  cinfo->SaveAs(("cinfo_"s + dirname + ".pdf").data());
   //save and clean up
-  canvas.Draw();
-  canvas.Write();
-  for (size_t i=0; i<frames.size(); i++) {
-    delete frames[i];
-  }
+  for (auto f : frames)
+    delete f;
+  delete info_frame;
   delete dataPass;
   delete dataFail;
+  delete cfits;
+  delete cinfo;
 }
 
 void TagProbeFitter::saveDistributionsPlot(RooWorkspace* w){
@@ -901,6 +944,7 @@ void TagProbeFitter::makeEfficiencyPlot1D(RooDataSet& eff, RooRealVar& v, const 
   p->SetLineWidth(2); p->SetMarkerStyle(kFullCircle); p->SetMarkerSize(1.2);
   p->Draw("P SAME");
   canvas.Write();
+  canvas.SaveAs(plotName + ".pdf");
   delete frame;
   delete p;  
 }

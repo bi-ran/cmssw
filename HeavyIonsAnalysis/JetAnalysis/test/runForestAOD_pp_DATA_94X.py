@@ -98,8 +98,7 @@ process.load("HeavyIonsAnalysis.JetAnalysis.hcalNoise_cff")
 #########################
 # Track Analyzer
 #########################
-process.load('HeavyIonsAnalysis.JetAnalysis.ExtraTrackReco_cff')
-process.load('HeavyIonsAnalysis.JetAnalysis.TrkAnalyzers_cff')
+process.load('HeavyIonsAnalysis.TrackAnalysis.TrkAnalyzers_cff')
 
 ####################################################################################
 
@@ -112,25 +111,6 @@ process.ggHiNtuplizerGED.doGenParticles = False
 
 ####################################################################################
 
-#####################
-# Electron ID
-#####################
-
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-# turn on VID producer, indicate data format to be processed
-# DataFormat.AOD or DataFormat.MiniAOD
-dataFormat = DataFormat.AOD
-switchOnVIDElectronIdProducer(process, dataFormat)
-
-# define which IDs we want to produce. Check here https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Recipe_for_regular_users_for_7_4
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
-
-# add them to the VID producer
-for idmod in my_id_modules:
-    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
-#####################################################################################
-
 #########################
 # Main analysis list
 #########################
@@ -138,11 +118,9 @@ for idmod in my_id_modules:
 process.ana_step = cms.Path(
     process.hltanalysis *
     process.hltobject *
-    # process.l1object +
+    process.l1object +
     process.hiEvtAnalyzer *
     process.jetSequence +
-    # Should be added in the path for VID module
-    # process.egmGsfElectronIDSequence +
     process.ggHiNtuplizer +
     process.ggHiNtuplizerGED +
     process.pfcandAnalyzer +

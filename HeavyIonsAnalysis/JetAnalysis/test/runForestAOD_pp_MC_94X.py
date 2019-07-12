@@ -90,10 +90,6 @@ process.load('HeavyIonsAnalysis.EventAnalysis.hltanalysis_cff')
 process.load('HeavyIonsAnalysis.EventAnalysis.hltobject_cfi')
 process.load('HeavyIonsAnalysis.EventAnalysis.l1object_cfi')
 
-process.load('HeavyIonsAnalysis.JetAnalysis.HiGenAnalyzer_cfi')
-process.HiGenParticleAna.genParticleSrc = cms.untracked.InputTag("genParticles")
-process.HiGenParticleAna.doHI = False
-
 process.load('HeavyIonsAnalysis.EventAnalysis.runanalyzer_cff')
 
 process.load("HeavyIonsAnalysis.JetAnalysis.pfcandAnalyzer_pp_cfi")
@@ -109,8 +105,8 @@ process.pfcandAnalyzer.genLabel         = cms.InputTag("genParticles")
 #########################
 # Track Analyzer
 #########################
-process.load('HeavyIonsAnalysis.JetAnalysis.ExtraTrackReco_cff')
-process.load('HeavyIonsAnalysis.JetAnalysis.TrkAnalyzers_cff')
+process.load('HeavyIonsAnalysis.TrackAnalysis.HiGenAnalyzer_cfi')
+process.load('HeavyIonsAnalysis.TrackAnalysis.TrkAnalyzers_cff')
 
 # Use this instead for track corrections
 # process.load('HeavyIonsAnalysis.JetAnalysis.TrkAnalyzers_Corr_cff')
@@ -124,25 +120,6 @@ process.load('HeavyIonsAnalysis.PhotonAnalysis.ggHiNtuplizer_cfi')
 
 ####################################################################################
 
-#####################
-# Electron ID
-#####################
-
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-# turn on VID producer, indicate data format to be processed
-# DataFormat.AOD or DataFormat.MiniAOD
-dataFormat = DataFormat.AOD
-switchOnVIDElectronIdProducer(process, dataFormat)
-
-# define which IDs we want to produce. https://twiki.cern.ch/twiki/bin/viewauth/CMS/CutBasedElectronIdentificationRun2#Recipe_for_regular_users_for_7_4
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff']
-
-# add them to the VID producer
-for idmod in my_id_modules:
-    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
-#####################################################################################
-
 #########################
 # Main analysis list
 #########################
@@ -151,11 +128,9 @@ process.ana_step = cms.Path(
     process.hltanalysis *
     process.hiEvtAnalyzer *
     process.hltobject +
-    # process.l1object +
+    process.l1object +
     process.genJetSequence +
     process.jetSequence +
-    # Should be added in the path for VID module
-    # process.egmGsfElectronIDSequence +
     process.ggHiNtuplizer +
     process.ggHiNtuplizerGED +
     process.pfcandAnalyzer +

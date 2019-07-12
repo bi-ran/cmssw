@@ -2,14 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 HiGenParticleAna = cms.EDAnalyzer(
     'HiGenAnalyzer',
-    doVertex = cms.untracked.bool(False),
-    etaMax = cms.untracked.double(2.5),
     ptMin = cms.untracked.double(5),
-    chargedOnly = cms.untracked.bool(False),
-    stableOnly = cms.untracked.bool(True),
-    src = cms.untracked.InputTag("generator"),
-    genParticleSrc = cms.untracked.InputTag("genParticles"),
-    genHIsrc = cms.untracked.InputTag("heavyIon"),
-    doParticles = cms.untracked.bool(True),
-    doHI = cms.untracked.bool(True)
+    etaMax = cms.untracked.double(2.5),
+    genParticleSrc = cms.InputTag("genParticles"),
+    genHiSrc = cms.InputTag("heavyIon"),
     )

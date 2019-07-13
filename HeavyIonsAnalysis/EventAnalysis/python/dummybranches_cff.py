@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-dummy_branches_for_PbPb_2018_HLT = cms.untracked.vstring([
+dummy_branches_for_PbPb_2018_HLT = cms.vstring([
     'DST_Physics_v7',
     'AlCa_EcalEtaEBonlyForHI_v1',
     'AlCa_EcalEtaEEonlyForHI_v1',
@@ -584,7 +584,7 @@ dummy_branches_for_PbPb_2018_HLT = cms.untracked.vstring([
     'HLT_ZDCP_v1',
     ])
 
-dummy_branches_for_PbPb_2018_L1 = cms.untracked.vstring([
+dummy_branches_for_PbPb_2018_L1 = cms.vstring([
     'L1_AlwaysTrue',
     'L1_BPTX_AND_Ref1_VME',
     'L1_BPTX_AND_Ref3_VME',

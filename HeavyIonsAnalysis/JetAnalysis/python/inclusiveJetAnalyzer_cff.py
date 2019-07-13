@@ -1,25 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
-inclusiveJetAnalyzer = cms.EDAnalyzer("HiInclusiveJetAnalyzer",
-                                      jetTag = cms.InputTag("icPu5patJets"),
-                                      jetPtMin = cms.double(5.0),
-                                      matchTag = cms.untracked.InputTag("akPu3PFpatJets"),
-                                      genjetTag = cms.InputTag("iterativeCone5HiGenJets"),
-                                      eventInfoTag = cms.InputTag("generator"),
-                                      isMC = cms.untracked.bool(False), 
-                                      fillGenJets = cms.untracked.bool(False),
-                                      rParam = cms.double(0.5),
-                                      trackTag = cms.InputTag("hiTracks"),
-                                      useHepMC = cms.untracked.bool(False),
-                                      useQuality = cms.untracked.bool(True),
-                                      trackQuality  = cms.untracked.string("highPurity"),
-                                      useCentrality = cms.untracked.bool(False),
-                                      doLifeTimeTagging = cms.untracked.bool(False),
-                                      doGenTaus = cms.untracked.bool(False),
-                                      doSubJets = cms.untracked.bool(False),
-                                      doJetConstituents = cms.untracked.bool(False),
-				      doWTARecluster = cms.untracked.bool(False),
-                                      doHiJetID = cms.untracked.bool(True),
-                                      doStandardJetID = cms.untracked.bool(False),
-                                      doSubEvent = cms.untracked.bool(False),
-                                      )
+inclusiveJetAnalyzer = cms.EDAnalyzer(
+    "HiInclusiveJetAnalyzer",
+    jetTag = cms.InputTag("ak4PFJets"),
+    jetPtMin = cms.double(5.0),
+    genjetTag = cms.InputTag("ak4GenJets"),
+    isMC = cms.untracked.bool(False), 
+    # dummy parameters below
+    matchTag = cms.untracked.InputTag("ak4PFpatJets"),
+    doGenTaus = cms.untracked.bool(False),
+    doSubEvent = cms.untracked.bool(False),
+    fillGenJets = cms.untracked.bool(False),
+    rParam = cms.double(0.4),
+    )

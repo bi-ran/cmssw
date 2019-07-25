@@ -92,6 +92,7 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("refphi", jets_.refphi, "refphi[nref]/F");
     t->Branch("refm", jets_.refm, "refm[nref]/F");
     t->Branch("refarea", jets_.refarea, "refarea[nref]/F");
+    t->Branch("refflavour", jets_.refflavour, "refflavour[nref]/F");
     t->Branch("subid", jets_.subid, "subid[nref]/I");
 
     t->Branch("ngen", &jets_.ngen, "ngen/I");
@@ -201,6 +202,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
         jets_.refarea[jets_.nref] = -999;
         jets_.subid[jets_.nref] = -999;
       }
+
+      jets_.refflavour[jets_.nref] = (*patjets)[j].partonFlavour();
     }
 
     jets_.nref++;

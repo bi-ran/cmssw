@@ -102,6 +102,7 @@ private:
     float refphi[MAXJETS];
     float refm[MAXJETS];
     float refarea[MAXJETS];
+    float refflavour[MAXJETS];
     int subid[MAXJETS];
 
     float pthat;

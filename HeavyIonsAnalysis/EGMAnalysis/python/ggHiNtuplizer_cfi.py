@@ -17,4 +17,6 @@ ggHiNtuplizer = cms.EDAnalyzer("ggHiNtuplizer",
     muonSrc = cms.InputTag("slimmedMuons"),
     beamSpotSrc = cms.InputTag('offlineBeamSpot'),
     conversionsSrc = cms.InputTag('reducedEgamma', 'reducedConversions', 'PAT'),
+
+    isolationTag = cms.string('photonIsolationHI'),
 )

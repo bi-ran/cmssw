@@ -2,12 +2,15 @@
 #include "HeavyIonsAnalysis/EGMAnalysis/plugins/GenParticleParentage.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/Common/interface/Ptr.h"
 #include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDetId/interface/EEDetId.h"
+#include "DataFormats/EgammaCandidates/interface/HIPhotonIsolation.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "RecoEgamma/EgammaTools/interface/EcalClusterLocal.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
@@ -39,6 +42,7 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) {
 
   if (doPhotons_) {
     photonsToken_ = consumes<edm::View<reco::Photon>>(ps.getParameter<edm::InputTag>("photonSrc"));
+    isolationTag_ = ps.getParameter<std::string>("isolationTag");
   }
 
   if (doMuons_) {
@@ -221,6 +225,23 @@ ggHiNtuplizer::ggHiNtuplizer(const edm::ParameterSet& ps) {
     tree_->Branch("phoE5x5_2012", &phoE5x5_2012_);
     tree_->Branch("phoMaxEnergyXtal_2012", &phoMaxEnergyXtal_2012_);
     tree_->Branch("phoSigmaEtaEta_2012", &phoSigmaEtaEta_2012_);
+
+    tree_->Branch("pho_ecalClusterIsoR2", &pho_ecalClusterIsoR2_);
+    tree_->Branch("pho_ecalClusterIsoR3", &pho_ecalClusterIsoR3_);
+    tree_->Branch("pho_ecalClusterIsoR4", &pho_ecalClusterIsoR4_);
+    tree_->Branch("pho_ecalClusterIsoR5", &pho_ecalClusterIsoR5_);
+    tree_->Branch("pho_hcalRechitIsoR1", &pho_hcalRechitIsoR1_);
+    tree_->Branch("pho_hcalRechitIsoR2", &pho_hcalRechitIsoR2_);
+    tree_->Branch("pho_hcalRechitIsoR3", &pho_hcalRechitIsoR3_);
+    tree_->Branch("pho_hcalRechitIsoR4", &pho_hcalRechitIsoR4_);
+    tree_->Branch("pho_hcalRechitIsoR5", &pho_hcalRechitIsoR5_);
+    tree_->Branch("pho_trackIsoR1PtCut20", &pho_trackIsoR1PtCut20_);
+    tree_->Branch("pho_trackIsoR2PtCut20", &pho_trackIsoR2PtCut20_);
+    tree_->Branch("pho_trackIsoR3PtCut20", &pho_trackIsoR3PtCut20_);
+    tree_->Branch("pho_trackIsoR4PtCut20", &pho_trackIsoR4PtCut20_);
+    tree_->Branch("pho_trackIsoR5PtCut20", &pho_trackIsoR5PtCut20_);
+    tree_->Branch("pho_swissCrx", &pho_swissCrx_);
+    tree_->Branch("pho_seedTime", &pho_seedTime_);
 
     tree_->Branch("phoBC1E", &phoBC1E_);
     tree_->Branch("phoBC1Ecorr", &phoBC1Ecorr_);
@@ -913,6 +934,27 @@ void ggHiNtuplizer::fillPhotons(const edm::Event& e, const edm::EventSetup& es, 
     phoE5x5_2012_.push_back(pho->full5x5_e5x5());
     phoMaxEnergyXtal_2012_.push_back(pho->full5x5_maxEnergyXtal());
     phoSigmaEtaEta_2012_.push_back(pho->full5x5_sigmaEtaEta());
+
+    auto recoptr = recoPhotons->ptrAt(pho - recoPhotons->begin());
+    auto patptr = static_cast<edm::Ptr<pat::Photon>>(recoptr);
+    auto isolation = patptr->userData<reco::HIPhotonIsolation>(isolationTag_);
+
+    pho_ecalClusterIsoR2_.push_back(isolation->ecalClusterIsoR2());
+    pho_ecalClusterIsoR3_.push_back(isolation->ecalClusterIsoR3());
+    pho_ecalClusterIsoR4_.push_back(isolation->ecalClusterIsoR4());
+    pho_ecalClusterIsoR5_.push_back(isolation->ecalClusterIsoR5());
+    pho_hcalRechitIsoR1_.push_back(isolation->hcalRechitIsoR1());
+    pho_hcalRechitIsoR2_.push_back(isolation->hcalRechitIsoR2());
+    pho_hcalRechitIsoR3_.push_back(isolation->hcalRechitIsoR3());
+    pho_hcalRechitIsoR4_.push_back(isolation->hcalRechitIsoR4());
+    pho_hcalRechitIsoR5_.push_back(isolation->hcalRechitIsoR5());
+    pho_trackIsoR1PtCut20_.push_back(isolation->trackIsoR1PtCut20());
+    pho_trackIsoR2PtCut20_.push_back(isolation->trackIsoR2PtCut20());
+    pho_trackIsoR3PtCut20_.push_back(isolation->trackIsoR3PtCut20());
+    pho_trackIsoR4PtCut20_.push_back(isolation->trackIsoR4PtCut20());
+    pho_trackIsoR5PtCut20_.push_back(isolation->trackIsoR5PtCut20());
+    pho_swissCrx_.push_back(isolation->swissCrx());
+    pho_seedTime_.push_back(isolation->seedTime());
 
     // seed BC
     if (pho->superCluster()->seed().isAvailable() && pho->superCluster()->seed().isNonnull()) {

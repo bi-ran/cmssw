@@ -56,6 +56,8 @@ private:
 
   bool isParticleGun_;
 
+  std::string isolationTag_;
+
   // handles to collections of objects
   edm::EDGetTokenT<std::vector<PileupSummaryInfo>> pileupToken_;
   edm::EDGetTokenT<std::vector<reco::GenParticle>> genParticlesToken_;
@@ -244,6 +246,23 @@ private:
   std::vector<float> phoE5x5_2012_;
   std::vector<float> phoMaxEnergyXtal_2012_;
   std::vector<float> phoSigmaEtaEta_2012_;
+
+  std::vector<float>  pho_ecalClusterIsoR2_;
+  std::vector<float>  pho_ecalClusterIsoR3_;
+  std::vector<float>  pho_ecalClusterIsoR4_;
+  std::vector<float>  pho_ecalClusterIsoR5_;
+  std::vector<float>  pho_hcalRechitIsoR1_;
+  std::vector<float>  pho_hcalRechitIsoR2_;
+  std::vector<float>  pho_hcalRechitIsoR3_;
+  std::vector<float>  pho_hcalRechitIsoR4_;
+  std::vector<float>  pho_hcalRechitIsoR5_;
+  std::vector<float>  pho_trackIsoR1PtCut20_;
+  std::vector<float>  pho_trackIsoR2PtCut20_;
+  std::vector<float>  pho_trackIsoR3PtCut20_;
+  std::vector<float>  pho_trackIsoR4PtCut20_;
+  std::vector<float>  pho_trackIsoR5PtCut20_;
+  std::vector<float>  pho_swissCrx_;
+  std::vector<float>  pho_seedTime_;
 
   std::vector<float> phoBC1E_;
   std::vector<float> phoBC1Ecorr_;

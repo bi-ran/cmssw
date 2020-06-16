@@ -45,15 +45,18 @@ akPu4PFJets = akPu5PFJets.clone(rParam       = cms.double(0.4), puPtMin = 20)
 akPu6PFJets = akPu5PFJets.clone(rParam       = cms.double(0.6), puPtMin = 30)
 akPu7PFJets = akPu5PFJets.clone(rParam       = cms.double(0.7), puPtMin = 35)
 
-ak4PFJetsForFlow = akPu5PFJets.clone(
-    Ghost_EtaMax = cms.double(5.0),
-    Rho_EtaMax = cms.double(4.4),
-    doRhoFastjet = cms.bool(False),
-    jetPtMin = cms.double(15.0),
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
+
+ak4PFJetsForFlow = ak4PFJets.clone(
+    Ghost_EtaMax = 5.0,
+    Rho_EtaMax = 4.4,
+    doRhoFastjet = False,
+    inputEtMin = 0.0,
+    jetPtMin = 15.0,
     nSigmaPU = cms.double(1.0),
-    rParam = cms.double(0.4),
+    rParam = 0.4,
     radiusPU = cms.double(0.5),
-    src = cms.InputTag("pfcandCleaner", "particleFlowCleaned"),
+    src = "hiPFCandCleaner:particleFlowCleaned",
 )
 
 kt4PFJetsForRho = cms.EDProducer(

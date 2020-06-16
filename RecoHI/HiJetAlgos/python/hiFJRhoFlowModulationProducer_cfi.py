@@ -7,7 +7,7 @@ hiFJRhoFlowModulationProducer = cms.EDProducer(
     doFreePlaneFit = cms.bool(False),
     doEvtPlane = cms.bool(False),
     doFlatTest = cms.bool(False),
-    jetTag = cms.InputTag("ak4PFJets"),
+    jetTag = cms.InputTag("ak4PFJetsForFlow"),
     EvtPlane = cms.InputTag("hiEvtPlane"),
     evtPlaneLevel = cms.int32(0)
     )
